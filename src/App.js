@@ -1,28 +1,44 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Suspense } from 'react';
+import Menu from './components/header/Menu';
+import SearchChannel from './components/search/SearchChannel';
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import PrivateRoute from './components/routing/PrivateRoute';
+import { MyChannelsView } from './components/channels/MyChannelsView';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+const SignIn = React.lazy(() => import('./components/users/SignIn'));
+const SignUp = React.lazy(() => import('./components/users/SignUp'));
+const Profile = React.lazy(() => import('./components/profile/Profile'));
+
+function WaitingComponent(Component) {
+    return props => (
+        <Suspense fallback={<div>Loading...</div>}>
+            <Component {...props} />
+        </Suspense>
     );
-  }
 }
 
-export default App;
+
+export default class App extends React.Component {
+
+    componentDidMount() {
+
+    }
+
+    render() {
+        return (
+            <Router>
+                <Menu>
+                    <div style={{ height: 65 }}></div>
+                    <div>
+                        <Switch>
+                            <Route exact path="/signin" component={WaitingComponent(SignIn)} />
+                            <Route exact path="/signup" component={WaitingComponent(SignUp)} />
+                            <PrivateRoute exact path="/my-profile" component={WaitingComponent(Profile)} />
+                            <PrivateRoute exact path="/my-channels" component={WaitingComponent(MyChannelsView)} />
+                            <Route path="/" component={SearchChannel} />
+                        </Switch>
+                    </div>
+                </Menu>
+            </Router>)
+    }
+}

@@ -1,0 +1,3 @@
+export const SIGNIN_ACTION = "SIGNIN_ACTION";
+export const SIGNOUT_ACTION = "SIGNOUT_ACTION";
+export const SET_AUTH_ACTION = "SET_AUTH_ACTION";
