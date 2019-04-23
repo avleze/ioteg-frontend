@@ -12,6 +12,9 @@ import Typography from '@material-ui/core/Typography';
 import withStyles from '@material-ui/core/styles/withStyles';
 import PasswordVerificationIndicator from '../utils/PasswordVerificationIndicator';
 import { signup } from '../../redux/reducers/auth';
+import notify from '../../lib/notifier';
+import { withRouter } from 'react-router-dom';
+import { FormHelperText } from '@material-ui/core';
 
 const styles = theme => ({
   main: {
@@ -51,7 +54,8 @@ class SignUp extends React.Component {
       username: "",
       email: "",
       password: "",
-      repeatPassword: ""
+      repeatPassword: "",
+      errors: {}
     }
 
     this.onFieldChange = this.onFieldChange.bind(this);
@@ -60,15 +64,30 @@ class SignUp extends React.Component {
 
   onFieldChange(ev) {
     this.setState({
-      [ev.target.name]: ev.target.value
+      [ev.target.name]: ev.target.value,
+      errors: {}
     });
   }
 
   onSubmit(ev) {
     ev.preventDefault();
     signup(this.state).then(response => {
-      console.log("success");
-    }).catch(() => console.log("error"));
+      notify({ content: "Registration successful", variant: "success" });
+      this.props.history.push("/signin");
+    }).catch((error) => {
+
+      let errors = {};
+
+      error.response.data["subErrors"].forEach(error => {
+          errors[error.field] = error.message;
+      });
+
+      this.setState({
+          errors: errors
+      });
+
+      notify({ content: "Registration failed", variant: "error" });
+    });
   }
 
   render() {
@@ -85,14 +104,16 @@ class SignUp extends React.Component {
             Sign up
         </Typography>
           <form className={classes.form} onSubmit={this.onSubmit}>
-            <FormControl margin="normal" required fullWidth>
+            <FormControl margin="normal" required fullWidth error={this.state.errors.email !== undefined}>
               <InputLabel htmlFor="email">Email Address</InputLabel>
-              <Input id="email" name="email" autoComplete="email" autoFocus value={this.state.email} onChange={this.onFieldChange} />
+              <Input id="email" name="email" type="email" autoComplete="email" autoFocus value={this.state.email} onChange={this.onFieldChange} />
             </FormControl>
-            <FormControl margin="normal" required fullWidth>
+            <FormHelperText error hidden={this.state.errors.email === undefined}>{this.state.errors.email}</FormHelperText>
+            <FormControl margin="normal" required fullWidth error={this.state.errors.username !== undefined}>
               <InputLabel htmlFor="username">Username</InputLabel>
               <Input name="username" type="username" id="username" autoComplete="username" value={this.state.username} onChange={this.onFieldChange} />
             </FormControl>
+            <FormHelperText error hidden={this.state.errors.username === undefined}>{this.state.errors.username}</FormHelperText>
             <FormControl margin="normal" required fullWidth>
               <InputLabel htmlFor="password">Password</InputLabel>
               <Input name="password" type="password" id="password" autoComplete="new-password" value={this.state.password} onChange={this.onFieldChange} />
@@ -107,6 +128,7 @@ class SignUp extends React.Component {
               fullWidth
               variant="contained"
               color="primary"
+              disabled={this.state.password !== this.state.repeatPassword}
               className={classes.submit}
             >
               SIGN UP
@@ -123,4 +145,4 @@ SignUp.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(SignUp);
+export default withStyles(styles)(withRouter(SignUp));

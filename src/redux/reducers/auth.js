@@ -1,5 +1,5 @@
 import { SET_AUTH_ACTION } from "../../config/action-types";
-
+import jwt_decode from "jwt-decode";
 import Axios from "axios";
 
 export const SIGNUP_ENDPOINT = "/api/users";
@@ -11,8 +11,6 @@ const apiUrl = "/api/users";
 export function auth(state = {}, action) {
     switch (action.type) {
         case SET_AUTH_ACTION:
-            if(action.payload.token)
-                localStorage.setItem('token', action.payload.token)
             return { ...action.payload };
         default:
             return { isLoggedIn: false };
@@ -27,14 +25,17 @@ export function signin(userData) {
         return Axios.post(endpointUrl, {
             username: userData.username, password: userData.password
         }).then(response => {
-            dispatch({
-                type: SET_AUTH_ACTION,
-                payload: { ...response.data, isLoggedIn: true, token: response.headers.authorization },
-            })
+            localStorage.setItem('token', response.headers.authorization);
+            let userId = jwt_decode(response.headers.authorization).sub;
+            Axios.get(`${apiUrl}/${userId}`).then(res => {
+                dispatch({
+                    type: SET_AUTH_ACTION,
+                    payload: { ...res.data, isLoggedIn: true},
+                })
+            });
+           
             return response;
         }).catch(error => {
-            console.log(error)
-
             dispatch({
                 type: SET_AUTH_ACTION,
                 payload: { isLoggedIn: false, hasError: true },

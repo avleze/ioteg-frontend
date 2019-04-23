@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { TextField, Button, Paper, Typography, Grid } from '@material-ui/core';
+import { TextField, Button, Paper, Typography, Grid, FormHelperText } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import PasswordVerificationIndicator from '../utils/PasswordVerificationIndicator';
+import Axios from 'axios';
+import notify from '../../lib/notifier';
 
 const styles = theme => ({
     formControl: {
@@ -18,7 +20,8 @@ class PasswordEditor extends React.Component {
             currentPassword: "",
             newPassword: "",
             repeatNewPassword: "",
-            disable: true
+            disable: true,
+            error: false,
         }
 
         this.onFieldChange = this.onFieldChange.bind(this);
@@ -30,13 +33,15 @@ class PasswordEditor extends React.Component {
             currentPassword: "",
             newPassword: "",
             repeatNewPassword: "",
-            disable: true
+            disable: true,
+            error: false
         })
     }
 
     onFieldChange(ev) {
         this.setState({
-            [ev.target.name]: ev.target.value
+            [ev.target.name]: ev.target.value,
+            error: false
         }, () => this.setState({
             disable: this.needsToBeDisabled(this.state)
         }));
@@ -48,6 +53,18 @@ class PasswordEditor extends React.Component {
 
     onSubmit(ev) {
         ev.preventDefault();
+
+        Axios.patch(`/api/users/${this.props.userId}/password`, {
+            oldPassword: this.state.currentPassword,
+            newPassword: this.state.newPassword
+        }).then(response => notify({ content: "Password changed successfully", variant: "success" }))
+            .catch(error => {
+                this.setState({
+                    error: true,
+                    errorMessage: error.response.data.subErrors[0].message
+                })
+                notify({ content: "There was an error changing the password", variant: "error" })
+            });
     }
 
     render() {
@@ -64,9 +81,11 @@ class PasswordEditor extends React.Component {
                         value={this.state.currentPassword}
                         onChange={this.onFieldChange}
                         autoComplete="current-password"
+                        error={this.state.error}
                         fullWidth
                         required
                     />
+                    <FormHelperText error hidden={!this.state.error}>{this.state.errorMessage}</FormHelperText>
                     <TextField
                         className={this.props.classes.formControl}
                         id="newPassword"
@@ -79,7 +98,7 @@ class PasswordEditor extends React.Component {
                         fullWidth
                         required
                     />
-                     <TextField
+                    <TextField
                         className={this.props.classes.formControl}
                         id="repeatNewPassword"
                         name="repeatNewPassword"

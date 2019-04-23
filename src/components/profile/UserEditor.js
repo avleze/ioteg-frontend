@@ -1,7 +1,10 @@
 import * as React from 'react';
-import { TextField, Button, Paper, Typography, Grid } from '@material-ui/core';
+import { TextField, Button, Paper, Typography, Grid, FormHelperText } from '@material-ui/core';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
+import Axios from 'axios';
+import notify from '../../lib/notifier';
+import { SET_AUTH_ACTION } from '../../config/action-types';
 
 const styles = theme => ({
     formControl: {
@@ -18,6 +21,7 @@ class UserEditor extends React.Component {
             username: "",
             email: "",
             changed: false,
+            errors: {}
         }
 
         this.onFieldChange = this.onFieldChange.bind(this);
@@ -28,13 +32,15 @@ class UserEditor extends React.Component {
         this.setState({
             username: this.props.username,
             email: this.props.email,
-            changed: false
+            changed: false,
+            errors: {}
         })
     }
 
     onFieldChange(ev) {
         this.setState({
-            [ev.target.name]: ev.target.value
+            [ev.target.name]: ev.target.value,
+            errors: {}
         }, () => {
             this.setState({
                 changed: this.checkIfChanged(this.state)
@@ -48,6 +54,27 @@ class UserEditor extends React.Component {
 
     onSubmit(ev) {
         ev.preventDefault();
+
+        Axios.put(`/api/users/${this.props.userId}`, {
+            username: this.state.username,
+            email: this.state.email
+        }).then(response => {
+            this.props.dispatch({type: SET_AUTH_ACTION, payload: {isLoggedIn: true, ...response.data}});
+            notify({ content: "User modified successfully", variant: "success" });
+        })
+            .catch(error => {
+                let errors = {};
+
+                error.response.data["subErrors"].forEach(error => {
+                    errors[error.field] = error.message;
+                });
+
+                this.setState({
+                    errors: errors
+                });
+
+                notify({ content: "User modification failed", variant: "error" });
+            })
     }
 
     render() {
@@ -64,8 +91,10 @@ class UserEditor extends React.Component {
                         value={this.state.username}
                         onChange={this.onFieldChange}
                         autoComplete="username"
+                        error={this.state.errors.username !== undefined}
                         fullWidth
                     />
+                    <FormHelperText error hidden={this.state.errors.username === undefined}>{this.state.errors.username}</FormHelperText>
                     <TextField
                         className={this.props.classes.formControl}
                         id="email"
@@ -74,9 +103,11 @@ class UserEditor extends React.Component {
                         label="Email"
                         value={this.state.email}
                         onChange={this.onFieldChange}
+                        error={this.state.errors.email !== undefined}
                         autoComplete="email"
                         fullWidth
                     />
+                    <FormHelperText error hidden={this.state.errors.email === undefined}>{this.state.errors.email}</FormHelperText>
                     <Grid container justify="flex-end">
                         <Button variant="contained" type="submit" color="primary" disabled={!this.state.changed}>Save changes</Button>
                     </Grid>
