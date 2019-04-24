@@ -47,6 +47,8 @@ class LateralMenu extends React.Component {
 
     onSignOut() {
         this.props.dispatch({ type: SET_AUTH_ACTION, payload: { isLoggedIn: false } });
+        localStorage.setItem('token', '')
+        sessionStorage.setItem('token', '')
         this.props.onToggle();
         this.props.history.push("/")
     }

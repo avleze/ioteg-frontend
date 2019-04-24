@@ -79,11 +79,11 @@ class SignUp extends React.Component {
       let errors = {};
 
       error.response.data["subErrors"].forEach(error => {
-          errors[error.field] = error.message;
+        errors[error.field] = error.message;
       });
 
       this.setState({
-          errors: errors
+        errors: errors
       });
 
       notify({ content: "Registration failed", variant: "error" });

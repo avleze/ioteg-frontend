@@ -9,7 +9,7 @@ class PrivateRoute extends React.Component {
         const { component: Component, ...rest } = this.props;
 
         return (<Route {...rest} render={() =>
-            this.props.auth.isLoggedIn ?
+            (localStorage.getItem('token') || sessionStorage.getItem('token')) ?
              <Component {...this.props}/> : <Redirect to='/signin' />
         }/>);
     }

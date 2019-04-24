@@ -19,6 +19,11 @@ const theme = createMuiTheme({
     typography: {
         useNextVariants: true,
         fontSize: 16,
+    },
+    palette: {
+        background: {
+            paper: "#fcfcfc"
+        }
     }
 });
 
