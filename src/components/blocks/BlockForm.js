@@ -4,67 +4,44 @@ import { withRouter } from 'react-router-dom';
 import Axios from 'axios';
 import notify from '../../lib/notifier';
 import confirmate from '../../lib/confirmation';
-
+import propTypes from 'prop-types';
 
 const formFields = [
     {
-        id: "eventName",
+        id: "name",
         name: "name",
         type: "text",
-        label: "Event Name",
-        errorField: "eventType.name",
+        label: "Block name",
+        errorField: "name",
         xs: 12,
         md: 12,
-        lg: 12
+        lg: 6
     },
     {
-        id: "delay",
-        name: "delay",
+        id: "repetition",
+        name: "repetition",
         type: "number",
-        label: "Delay",
-        errorField: "delay",
+        label: "Repetition",
+        errorField: "repetition",
         xs: 12,
         md: 12,
-        lg: 4
-    },
-    {
-        id: "period",
-        name: "period",
-        type: "number",
-        label: "Period",
-        errorField: "period",
-        xs: 12,
-        md: 12,
-        lg: 4
-    },
-    {
-        id: "unit",
-        name: "unit",
-        type: "select",
-        label: "Unit",
-        errorField: "unit",
-        items: ["NANOSECONDS", "MICROSECONDS", "MILLISECONDS", "SECONDS", "MINUTES", "HOURS", "DAYS"],
-        xs: 12,
-        md: 12,
-        lg: 4
+        lg: 6
     }
 ]
 
-const successCreateNotification = { content: 'Configurable event type created successfully', variant: "success" };
-const errorCreateNotification = { content: 'Failed when creating configurable event type.', variant: "error" };
+const successCreateNotification = { content: 'Block created successfully', variant: "success" };
+const errorCreateNotification = { content: 'Failed when creating the block.', variant: "error" };
 
-const successEditNotification = { content: 'Configurable event type edited successfully', variant: "success" };
-const errorEditNotification = { content: 'Failed when editing configurable event type.', variant: "error" };
+const successEditNotification = { content: 'Block edited successfully', variant: "success" };
+const errorEditNotification = { content: 'Failed when editing the block.', variant: "error" };
 
-class ConfigurableEventTypeForm extends React.Component {
+class BlockForm extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            name: "",
-            delay: 0,
-            period: "",
-            unit: "SECONDS",
+            name: props.block.name || "",
+            repetition: props.block.repetition || null,
             errors: {}
         };
 
@@ -73,32 +50,28 @@ class ConfigurableEventTypeForm extends React.Component {
     }
 
     componentDidMount() {
-        if (this.props.id)
-            Axios.get(`/api/channels/1/configurableEventTypes/${this.props.id}`).then(async configurableEventType => {
-                this.setState({
-                    name: configurableEventType.data.eventType.name,
-                    ...configurableEventType.data
-                });
+        console.log(this.props.block)
+        if (this.props.block)
+            this.setState({
+                ...this.props.block
             })
     }
 
     onSubmit(e) {
         e.preventDefault();
 
-        confirmate(() => {
-            let configurableEventType = {
-                eventType: {
-                    name: this.state.name
-                },
-                delay: this.state.delay,
-                period: this.state.period,
-                unit: this.state.unit
-            }
+        const eventId = this.props.eventId;
+        const blockId = this.state.id;
 
-            if (this.props.id) {
-                configurableEventType["id"] = this.props.id;
-                configurableEventType["eventType.id"] = this.props.id;
-                Axios.put(`/api/channels/1/configurableEventTypes/${this.props.id}`, configurableEventType)
+        let block = {
+            name: this.state.name,
+            repetition: this.state.repetition
+        }
+
+        confirmate(() => {
+
+            if (this.state.id) {
+                Axios.put(`/api/events/${blockId}/blocks/${blockId}`, block)
                     .then(response => notify(successEditNotification))
                     .catch(error => {
                         let errors = {};
@@ -113,7 +86,7 @@ class ConfigurableEventTypeForm extends React.Component {
                         notify(errorEditNotification);
                     });
             } else {
-                Axios.post(`/api/channels/${this.props.channelId}/configurableEventTypes`, configurableEventType)
+                Axios.post(`/api/events/${eventId}/blocks`, block)
                     .then(response => notify(successCreateNotification))
                     .catch(error => {
                         let errors = {};
@@ -153,7 +126,7 @@ class ConfigurableEventTypeForm extends React.Component {
                                     variant="outlined"
                                     name={formField.name}
                                     type={formField.type}
-                                    value={this.state[formField.name]}
+                                    value={this.state[formField.name] ? this.state[formField.name] : ""}
                                     onChange={this.onFieldChange}
                                     fullWidth
                                     error={this.state.errors[formField.errorField]}>
@@ -178,4 +151,9 @@ class ConfigurableEventTypeForm extends React.Component {
     }
 }
 
-export default withRouter(ConfigurableEventTypeForm);
+BlockForm.propTypes = {
+    eventId: propTypes.string.isRequired,
+    block: propTypes.object
+}
+
+export default withRouter(BlockForm);

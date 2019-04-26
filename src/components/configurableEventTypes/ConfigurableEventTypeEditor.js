@@ -1,122 +1,129 @@
 import * as React from "react";
-import { CustomMaterialTable } from "../utils/CustomMaterialTable";
 import Axios from "axios";
-import { Paper, Grid, Typography, Divider, Button, Fab } from "@material-ui/core";
-import ChannelForm from "./ChannelForm";
+import { Paper, Grid, Typography, Divider, Button } from "@material-ui/core";
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
+import { withRouter } from 'react-router'
+import ConfigurableEventTypeForm from "./ConfigurableEventTypeForm";
+import { BlockList } from "../blocks/BlockList";
+import confirm from "../../lib/confirmation";
+import notify from "../../lib/notifier";
 
-const configurableEventTypeColumns = [
-    { title: 'Event Name', field: 'name' },
-]
+const successBlockDelete = { content: 'Block deleted successfully', variant: 'success' }
+const errorBlockDelete = { content: 'Failed when deleting the block', variant: 'error' }
 
-export class ChannelEditor extends React.Component {
+class ConfigurableEventTypeEditor extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            channelName: "",
-            configurableEventTypes: null
+            blocks: []
         }
+        this.getDataFromEndpoint = this.getDataFromEndpoint.bind(this);
+
+        this.onBlockAdd = this.onBlockAdd.bind(this);
+        this.onBlockDelete = this.onBlockDelete.bind(this);
+        this.onBlockEdit = this.onBlockEdit.bind(this);
     }
 
     async componentDidMount() {
-        const channelId = this.props.match.params["channelId"];
-        const userId = this.props.match.params["userId"];
-        if (channelId !== undefined)
-            await Axios.get(`/api/users/${userId}/channels/${channelId}`).then(async channel => {
+        await this.getDataFromEndpoint();
+    }
 
-                await Axios.get(`/api/channels/${channelId}/configurableEventTypes`).then(configurableEventTypes => {
+    async getDataFromEndpoint() {
+        const channelId = this.props.match.params["channelId"];
+        const configurableEventTypeId = this.props.match.params["configurableEventTypeId"];
+        if (configurableEventTypeId !== undefined)
+            await Axios.get(`/api/channels/${channelId}/configurableEventTypes/${configurableEventTypeId}`).then(async configurableEventType => {
+
+                await Axios.get(`/api/events/${configurableEventType.data.eventType.id}/blocks`).then(blocks => {
                     this.setState({
-                        id: channelId,
-                        channelName: channel.data["channelName"],
-                        configurableEventTypes: configurableEventTypes.data
+                        eventId: configurableEventType.data.eventType.id,
+                        blocks: blocks.data
                     });
                 })
             })
     }
 
+    onBlockAdd() {
+        const eventId = this.state.eventId;
+        this.props.history.push(`/events/${eventId}/blocks/new`);
+    }
 
+    onBlockDelete(blockData) {
+        const eventId = this.state.eventId;
+        const blockId = blockData.id;
+
+        confirm(() => {
+            Axios.delete(`/api/events/${eventId}/blocks/${blockId}`)
+                .then(response => {
+                    this.getDataFromEndpoint();
+                    notify(successBlockDelete)
+                })
+                .catch(error => notify(errorBlockDelete))
+
+        })
+    }
+
+    onBlockEdit(blockData) {
+        const eventId = this.state.eventId;
+        const blockId = blockData.id;
+        this.props.history.push(`/events/${eventId}/blocks/edit/${blockId}`);
+    }
 
     render() {
+        const configurableEventTypeId = this.props.match.params["configurableEventTypeId"];
+        const channelId = this.props.match.params["channelId"];
+
         return (<React.Fragment>
             <Paper style={{ padding: 60 }} elevation={5}>
 
                 <Grid container justify="center" spacing={24}>
 
-                    <Grid item container xs={12} md={12} lg={5} spacing={24} justify="center">
+                    <Grid item container xs={12} md={12} lg={8} xl={5} spacing={24} justify="center">
                         <Grid item xs={12}>
                             <Grid item xs container justify="center">
-                                <Grid item xs={4} alignItems="flex-start">
+                                <Grid item xs={4}>
                                     <Button variant="contained" color="primary" onClick={() => this.props.history.goBack()}>
                                         <ChevronLeft /> BACK
                                     </Button>
                                 </Grid>
-                                <Grid item xs={4} alignItems="center">
+                                <Grid item xs={4}>
                                     <Typography variant="h5" align="center">
-                                        {this.state.id ? "Editing" : "New"} channel {this.props.match.params["channelId"]}
+                                        {configurableEventTypeId ? "Editing" : "New"} configurable event type {configurableEventTypeId}
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={4} justify="center">
+                                <Grid item xs={4}>
                                 </Grid>
                             </Grid>
 
                             <Divider variant="fullWidth" />
-                            <Typography variant="h6">Channel data</Typography>
-                            <Typography hidden={this.state.id} gutterBottom>
-                                Fill the name of the channel please. Once it is created you will be able to add the related fields.
+                            <Typography variant="h6">Configurable Event Type Data</Typography>
+                            <Typography hidden={configurableEventTypeId} gutterBottom>
+                                Fill the name of the event, and its configurable parameters regarding the distribution in time please. Once it is created you will be able to add the related fields.
                             </Typography>
                             <Paper style={{ padding: 15 }}>
                                 <Grid container>
                                     <Grid item xs>
-                                        <ChannelForm userId={this.props.match.params["userId"]} channel={this.state} key={this.state.id} onSubmit={this.onChannelFormSubmit} />
+                                        <ConfigurableEventTypeForm id={configurableEventTypeId} channelId={channelId} key={configurableEventTypeId} />
                                     </Grid>
                                 </Grid>
                             </Paper>
                         </Grid>
-                        <Grid item xs={12} hidden={this.state.id === undefined}>
-
-                            <Typography variant="h6">Related with Channel</Typography>
-                            <CustomMaterialTable data={this.state.channels}
-                                columns={configurableEventTypeColumns}
-                                title="Configurable Event Types"
-                                actions={[
-                                    {
-                                        icon: 'edit',
-                                        tooltip: 'Edit configurable event type',
-                                        onClick: (event, rowData) => {
-                                            //this.props.history.push(`/user/${this.props.id}/channels/edit/${rowData.id}`)
-                                        },
-                                    },
-                                    {
-                                        icon: 'delete',
-                                        tooltip: 'Delete configurable event type',
-                                        onClick: (event, rowData) => {
-
-                                        },
-                                    },
-                                    {
-                                        icon: 'add',
-                                        tooltip: 'Add configurable event type',
-                                        isFreeAction: true,
-                                        onClick: (event) => {
-
-                                        },
-                                    },
-                                ]
-                                }
-                                options={{
-                                    actionsColumnIndex: -1,
-                                    columnsButton: true,
-                                }}></CustomMaterialTable>
+                        <Grid item xs={12} hidden={!configurableEventTypeId}>
+                            <Typography variant="h6">Relations</Typography>
+                            <BlockList blocks={this.state.blocks}
+                                onAdd={this.onBlockAdd}
+                                onEdit={this.onBlockEdit}
+                                onDelete={this.onBlockDelete} />
                         </Grid>
                     </Grid>
 
                 </Grid>
 
             </Paper>
-
-
         </React.Fragment >)
     }
 
 }
+
+export default withRouter(ConfigurableEventTypeEditor);

@@ -4,13 +4,14 @@ import { TextField, Button, Grid, FormHelperText } from '@material-ui/core';
 import Axios from 'axios';
 import notify from '../../lib/notifier';
 import { withRouter } from 'react-router-dom';
+import confirmate from '../../lib/confirmation';
 
 class ChannelForm extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            channelName: props.channelName || "",
+            channelName: props.channel.channelName || "",
             errors: {}
         };
 
@@ -27,47 +28,51 @@ class ChannelForm extends React.Component {
 
     onSubmit(e) {
         e.preventDefault();
-        const channel = { ...this.state };
-        const channelId = this.props.channel.id;
-        const userId = this.props.userId;
 
-        if (channelId)
-            Axios.put(`/api/users/${userId}/channels/${channelId}`, channel)
-                .then(response => {
-                    notify({ content: "Channel edited successfully", variant: "success" })
-                })
-                .catch(error => {
-                    let errors = {};
+        confirmate(() => {
+            const channel = { ...this.state };
+            const channelId = this.props.channel.id;
+            const userId = this.props.userId;
 
-                    error.response.data["subErrors"].forEach(error => {
-                        errors[error.field] = error.message;
-                    });
+            if (channelId)
+                Axios.put(`/api/users/${userId}/channels/${channelId}`, channel)
+                    .then(response => {
+                        notify({ content: "Channel edited successfully", variant: "success" })
+                    })
+                    .catch(error => {
+                        let errors = {};
 
-                    this.setState({
-                        errors: errors
-                    });
+                        error.response.data["subErrors"].forEach(error => {
+                            errors[error.field] = error.message;
+                        });
 
-                    notify({ content: "There was an error editing the channel", variant: "error" })
-                })
-        else
-            Axios.post(`/api/users/${userId}/channels`, channel)
-                .then(response => {
-                    notify({ content: "Channel created successfully", variant: "success" })
-                    this.props.history.goBack();
-                })
-                .catch(error => {
-                    let errors = {};
+                        this.setState({
+                            errors: errors
+                        });
 
-                    error.response.data["subErrors"].forEach(error => {
-                        errors[error.field] = error.message;
-                    });
+                        notify({ content: "There was an error editing the channel", variant: "error" })
+                    })
+            else
+                Axios.post(`/api/users/${userId}/channels`, channel)
+                    .then(response => {
+                        notify({ content: "Channel created successfully", variant: "success" })
+                        this.props.history.goBack();
+                    })
+                    .catch(error => {
+                        let errors = {};
 
-                    this.setState({
-                        errors: errors
-                    });
+                        error.response.data["subErrors"].forEach(error => {
+                            errors[error.field] = error.message;
+                        });
 
-                    notify({ content: "There was an error creating the channel", variant: "error" })
-                })
+                        this.setState({
+                            errors: errors
+                        });
+
+                        notify({ content: "There was an error creating the channel", variant: "error" })
+                    })
+        })
+
     }
 
     onFieldChange(e) {
@@ -82,7 +87,7 @@ class ChannelForm extends React.Component {
             <form onSubmit={this.onSubmit}>
                 <Grid container spacing={8}>
                     <Grid item xs={12}>
-                        <TextField id="channelName" label="Channel Name" name="channelName" type="text" value={this.state.channelName} onChange={this.onFieldChange} fullWidth error={this.state.errors.channelName}/>
+                        <TextField id="channelName" variant="outlined" label="Channel Name" name="channelName" type="text" value={this.state.channelName} onChange={this.onFieldChange} fullWidth error={this.state.errors.channelName} />
                         <FormHelperText error hidden={!this.state.errors.channelName}>{this.state.errors.channelName}</FormHelperText>
                     </Grid>
                     <Grid item container xs={12} justify="flex-end">

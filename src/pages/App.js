@@ -4,8 +4,11 @@ import SearchChannel from '../components/search/SearchChannel';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import PrivateRoute from '../components/routing/PrivateRoute';
 import Notifier from '../components/Notifier';
-import { ChannelEditor } from '../components/channels/ChannelEditor';
+import { ConfirmationDialog } from '../components/ConfirmationDialog';
+import BlockEditor from '../components/blocks/BlockEditor';
 
+const ConfigurableEventTypeEditor = React.lazy(() => import('../components/configurableEventTypes/ConfigurableEventTypeEditor'))
+const ChannelEditor = React.lazy(() => import('../components/channels/ChannelEditor'));
 const SignIn = React.lazy(() => import('../components/users/SignIn'));
 const SignUp = React.lazy(() => import('../components/users/SignUp'));
 const ProfilePage = React.lazy(() => import('./ProfilePage'));
@@ -22,10 +25,6 @@ function WaitingComponent(Component) {
 
 export default class App extends React.Component {
 
-    componentDidMount() {
-
-    }
-
     render() {
         return (
             <Router>
@@ -41,11 +40,11 @@ export default class App extends React.Component {
                             <Route exact path="/user/:userId/channels/edit/:channelId" component={WaitingComponent(ChannelEditor)} />
                             <Route exact path="/user/:userId/channels/new" component={WaitingComponent(ChannelEditor)} />
                             
-                            <Route exact path="/channels/:channelId/configurableEventTypes/edit/:configurableEventTypeId" component={WaitingComponent(ChannelEditor)} />
-                            <Route exact path="/channels/:channelId/configurableEventTypes/new" component={WaitingComponent(ChannelEditor)} />
+                            <Route exact path="/channels/:channelId/configurableEventTypes/edit/:configurableEventTypeId" component={WaitingComponent(ConfigurableEventTypeEditor)} />
+                            <Route exact path="/channels/:channelId/configurableEventTypes/new" component={WaitingComponent(ConfigurableEventTypeEditor)} />
                             
-                            <Route exact path="/configurableEventTypes/:configurableEventTypeId/blocks/edit/:blockId" component={WaitingComponent(ChannelEditor)} />
-                            <Route exact path="/configurableEventTypes/:configurableEventTypeId/blocks/new" component={WaitingComponent(ChannelEditor)} />
+                            <Route exact path="/events/:eventTypeId/blocks/edit/:blockId" component={WaitingComponent(BlockEditor)} />
+                            <Route exact path="/events/:eventTypeId/blocks/new" component={WaitingComponent(BlockEditor)} />
                             
                             <Route exact path="/blocks/:blockId/fields/edit/:fieldId" component={WaitingComponent(ChannelEditor)} />
                             <Route exact path="/blocks/:blockId/fields/new" component={WaitingComponent(ChannelEditor)} />
@@ -62,6 +61,7 @@ export default class App extends React.Component {
                         </Switch>
                     </div>
                     <Notifier/>
+                    <ConfirmationDialog />
                 </Menu>
             </Router>)
     }
