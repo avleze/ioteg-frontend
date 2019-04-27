@@ -18,7 +18,7 @@ const setupAxiosInterceptors = onUnauthenticated => {
     const onResponseError = err => {
         if(!err.status)
         {
-            notify({content: "Failed when connecting to the server.", variant:"error"})
+            notify({content: "Failed when connecting to the server.", variant:"error"});
             return Promise.reject(err);
         }
 

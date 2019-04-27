@@ -1,6 +1,6 @@
 import * as React from "react";
-import { CustomMaterialTable } from "../utils/CustomMaterialTable";
 import propTypes from 'prop-types';
+import { CustomMaterialTable } from "../utils/CustomMaterialTable";
 
 const columns = [
     { title: 'Event Name', field: 'eventType.name' },
@@ -46,7 +46,8 @@ export class ConfigurableEventTypeList extends React.Component {
             columns={columns}
             title="Configurable Event Types"
             actions={this.actions}
-            options={options} />)
+            options={options} 
+            />)
     }
 }
 

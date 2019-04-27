@@ -3,10 +3,11 @@ import Axios from "axios";
 import { Paper, Grid, Typography, Divider, Button } from "@material-ui/core";
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import { withRouter } from 'react-router'
-import ConfigurableEventTypeForm from "./ConfigurableEventTypeForm";
-import { BlockList } from "../blocks/BlockList";
-import confirm from "../../lib/confirmation";
-import notify from "../../lib/notifier";
+import ConfigurableEventTypeForm from "../components/configurableEventTypes/ConfigurableEventTypeForm";
+import { BlockList } from "../components/blocks/BlockList";
+import confirm from "../lib/confirmation";
+import notify from "../lib/notifier";
+import Page from "./Page";
 
 const successBlockDelete = { content: 'Block deleted successfully', variant: 'success' }
 const errorBlockDelete = { content: 'Failed when deleting the block', variant: 'error' }
@@ -74,26 +75,17 @@ class ConfigurableEventTypeEditor extends React.Component {
         const configurableEventTypeId = this.props.match.params["configurableEventTypeId"];
         const channelId = this.props.match.params["channelId"];
 
-        return (<React.Fragment>
-            <Paper style={{ padding: 60 }} elevation={5}>
+        return (
+            <Page>
 
                 <Grid container justify="center" spacing={24}>
 
                     <Grid item container xs={12} md={12} lg={8} xl={5} spacing={24} justify="center">
                         <Grid item xs={12}>
                             <Grid item xs container justify="center">
-                                <Grid item xs={4}>
-                                    <Button variant="contained" color="primary" onClick={() => this.props.history.goBack()}>
-                                        <ChevronLeft /> BACK
-                                    </Button>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <Typography variant="h5" align="center">
-                                        {configurableEventTypeId ? "Editing" : "New"} configurable event type {configurableEventTypeId}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={4}>
-                                </Grid>
+                                <Typography variant="h5" align="center" gutterBottom>
+                                    {configurableEventTypeId ? "Editing" : "New"} configurable event type {configurableEventTypeId}
+                                </Typography>
                             </Grid>
 
                             <Divider variant="fullWidth" />
@@ -120,8 +112,8 @@ class ConfigurableEventTypeEditor extends React.Component {
 
                 </Grid>
 
-            </Paper>
-        </React.Fragment >)
+            </Page>
+        )
     }
 
 }

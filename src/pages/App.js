@@ -5,14 +5,14 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import PrivateRoute from '../components/routing/PrivateRoute';
 import Notifier from '../components/Notifier';
 import { ConfirmationDialog } from '../components/ConfirmationDialog';
-import BlockEditor from '../components/blocks/BlockEditor';
 
-const ConfigurableEventTypeEditor = React.lazy(() => import('../components/configurableEventTypes/ConfigurableEventTypeEditor'))
-const ChannelEditor = React.lazy(() => import('../components/channels/ChannelEditor'));
+const ConfigurableEventTypeEditor = React.lazy(() => import('../pages/ConfigurableEventTypeEditor'))
+const ChannelEditor = React.lazy(() => import('../pages/ChannelEditor'));
+const BlockEditor = React.lazy(() => import('../pages/BlockEditor'));
 const SignIn = React.lazy(() => import('../components/users/SignIn'));
 const SignUp = React.lazy(() => import('../components/users/SignUp'));
-const ProfilePage = React.lazy(() => import('./ProfilePage'));
-const MyChannelsPage = React.lazy(() => import('./MyChannelsPage'));
+const ProfilePage = React.lazy(() => import('../pages/ProfilePage'));
+const MyChannelsPage = React.lazy(() => import('../pages/MyChannelsPage'));
 
 function WaitingComponent(Component) {
     return props => (

@@ -1,11 +1,11 @@
 import * as React from "react";
-import { CustomMaterialTable } from "../utils/CustomMaterialTable";
 import propTypes from 'prop-types';
+import { CustomMaterialTable } from "../utils/CustomMaterialTable";
 
 const fieldColumns = [
-    { title: 'Field name', field: 'name' },
-    { title: 'Type', field: 'type' },
-    { title: 'Quotes', field: 'quotes' }
+    { title: 'Field name', field: 'name', type: 'string'},
+    { title: 'Type', field: 'type', type: 'string' },
+    { title: 'Quotes', field: 'quotes' , type: 'boolean'}
 ]
 
 
@@ -42,7 +42,7 @@ export class FieldList extends React.Component {
 
 
     render() {
-        return (<CustomMaterialTable data={this.props.blocks}
+        return (<CustomMaterialTable data={this.props.fields}
             columns={fieldColumns}
             title="Fields"
             actions={this.actions}

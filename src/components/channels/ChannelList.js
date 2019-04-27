@@ -1,6 +1,6 @@
 import * as React from "react";
-import { CustomMaterialTable } from "../utils/CustomMaterialTable";
 import propTypes from 'prop-types';
+import { CustomMaterialTable } from "../utils/CustomMaterialTable";
 
 const columns = [
     { title: 'Channel Name', field: 'channelName' },

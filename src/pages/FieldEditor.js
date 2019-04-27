@@ -4,37 +4,50 @@ import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import { withRouter } from 'react-router'
 import Axios from "axios";
 import BlockForm from "./BlockForm";
-import { FieldList } from "../fields/FieldList";
-import { OptionalFieldsList } from "../optionalfields/OptionalFieldsList";
-import confirm from "../../lib/confirmation";
-import notify from "../../lib/notifier";
+import { FieldList } from "../components/fields/FieldList";
+import { OptionalFieldsList } from "../components/optionalfields/OptionalFieldsList";
+import confirm from "../lib/confirmation";
+import notify from "../lib/notifier";
 
-const fieldDeleteSuccess = {content: 'Field deleted successfully.'} 
-const fieldDeleteError = {content: 'Failed when deleting the field.'} 
+const fieldDeleteSuccess = { content: 'Field deleted successfully.' }
+const fieldDeleteError = { content: 'Failed when deleting the field.' }
 
 class BlockEditor extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            block: {id: null},
+            block: { id: null },
             optionalFields: [],
-            fields: [], 
+            fields: [],
             injectedFields: []
         }
 
         this.onFieldDelete = this.onFieldDelete.bind(this);
+        this.getDataFromEndpoint = this.getDataFromEndpoint.bind(this);
     }
 
     async componentDidMount() {
+        await this.getDataFromEndpoint();
+    }
+
+    async getDataFromEndpoint() {
         const eventId = this.props.match.params["eventTypeId"];
         const blockId = this.props.match.params["blockId"];
-        if(blockId)
-            await Axios.get(`/api/events/${eventId}/blocks/${blockId}`).then(block => {
-                this.setState({
-                    block: block.data
+        if (blockId) {
+            Promise.all([Axios.get(`/api/events/${eventId}/blocks/${blockId}`),
+            Axios.get(`/api/blocks/${blockId}/fields`)
+            ])
+                .then(responses => {
+                    console.log(responses);
+                    this.setState({
+                        block: responses[0].data,
+                        fields: responses[1].data,
+                        //optionalFields: responses[2].data
+                    })
                 })
-            })
+
+        }
     }
 
     onFieldDelete(rowData) {
@@ -42,8 +55,11 @@ class BlockEditor extends React.Component {
         const fieldId = rowData.id;
         confirm(() => {
             Axios.delete(`/api/blocks/${blockId}/fields/${fieldId}`)
-            .then(response => notify(fieldDeleteSuccess))
-            .catch(error => notify(fieldDeleteError));
+                .then(response => {
+                    this.getDataFromEndpoint();
+                    notify(fieldDeleteSuccess)
+                })
+                .catch(error => notify(fieldDeleteError));
         })
     }
 
@@ -81,19 +97,9 @@ class BlockEditor extends React.Component {
                             <Paper style={{ padding: 15 }}>
                                 <Grid container>
                                     <Grid item xs>
-                                        <BlockForm eventId={eventId} block={this.state.block} key={blockId}/>
                                     </Grid>
                                 </Grid>
                             </Paper>
-                        </Grid>
-                        <Grid item xs={12} hidden={!blockId}>
-                            <FieldList fields={this.state.fields} 
-                                onAdd={this.onFieldAdd}
-                                onEdit={this.onFieldEdit}
-                                onDelete={this.onFieldDelete}/>
-                        </Grid>
-                        <Grid item xs={12} hidden={!blockId}>
-                            <OptionalFieldsList optionalFields={this.state.optionalFields} />
                         </Grid>
                     </Grid>
 
@@ -104,5 +110,3 @@ class BlockEditor extends React.Component {
     }
 
 }
-
-export default withRouter(BlockEditor);

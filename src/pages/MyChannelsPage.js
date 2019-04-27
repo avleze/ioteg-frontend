@@ -7,6 +7,7 @@ import jwt_decode from 'jwt-decode';
 import notify from '../lib/notifier';
 import { ChannelList } from '../components/channels/ChannelList';
 import confirm from '../lib/confirmation';
+import Page from './Page';
 
 const successChannelDelete = { content: "Channel deleted successfully", variant: "success" };
 const errorChannelDelete = { content: "There was an error when deleting the channel", variant: "error" };
@@ -52,43 +53,40 @@ export class MyChannelsPage extends React.Component {
     onChannelDelete(rowData) {
         confirm(() => {
             Axios.delete(`/api/users/${this.props.id}/channels/${rowData.id}`)
-            .then(response => {
-                this.getDataFromEndpoint();
-                notify(successChannelDelete)
-            })
-            .catch(error => notify(errorChannelDelete));
+                .then(response => {
+                    this.getDataFromEndpoint();
+                    notify(successChannelDelete)
+                })
+                .catch(error => notify(errorChannelDelete));
         })
     }
 
 
     render() {
         return (
-            <React.Fragment>
+            <Page topBar={false}>
+                <Grid container justify="center" spacing={24}>
 
-                <Paper style={{ padding: 60 }} elevation={5}>
+                    <Grid item container xs={12} md={12} lg={5} spacing={24}>
 
-                    <Grid container justify="center" spacing={24}>
+                        <Grid item xs={12}>
+                            <Typography variant="h5" gutterBottom>My channels</Typography>
+                            <Typography variant="body2" gutterBottom>
+                                Here you have your channels.
 
-                        <Grid item container xs={12} md={12} lg={5} spacing={24}>
-
-                            <Grid item xs={12}>
-                                <Typography variant="h5" gutterBottom>My channels</Typography>
-                                <Typography variant="body2" gutterBottom>
-                                    Here you have your channels.
-
-                                    A channel is compound by configurable event types. If you want to edit a channel and its subcomponents, just click the pencil icon and IoT-TEG will carry you to the edition page.
+                                A channel is compound by configurable event types. If you want to edit a channel and its subcomponents, just click the pencil icon and IoT-TEG will carry you to the edition page.
                                 </Typography>
-                                <ChannelList channels={this.state.channels}
-                                    onAdd={this.onChannelAdd}
-                                    onDelete={this.onChannelDelete}
-                                    onEdit={this.onChannelEdit} />
-                            </Grid>
+                            <ChannelList channels={this.state.channels}
+                                onAdd={this.onChannelAdd}
+                                onDelete={this.onChannelDelete}
+                                onEdit={this.onChannelEdit} />
                         </Grid>
-
                     </Grid>
 
-                </Paper>
-            </React.Fragment>)
+                </Grid>
+
+            </Page>
+        )
     }
 }
 
