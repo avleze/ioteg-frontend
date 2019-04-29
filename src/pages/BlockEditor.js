@@ -24,6 +24,9 @@ class BlockEditor extends React.Component {
         }
 
         this.onFieldDelete = this.onFieldDelete.bind(this);
+        this.onFieldAdd = this.onFieldAdd.bind(this);
+        this.onFieldEdit = this.onFieldEdit.bind(this);
+
         this.getDataFromEndpoint = this.getDataFromEndpoint.bind(this);
     }
 
@@ -48,6 +51,16 @@ class BlockEditor extends React.Component {
                 })
 
         }
+    }
+
+    onFieldAdd() {
+        const blockId = this.props.match.params["blockId"];
+        this.props.history.push(`/blocks/${blockId}/fields/new`);
+    }
+
+    onFieldEdit(rowData) {
+        const blockId = this.props.match.params["blockId"];
+        this.props.history.push(`/blocks/${blockId}/fields/edit/${rowData.id}`);
     }
 
     onFieldDelete(rowData) {

@@ -5,8 +5,6 @@ import Page from "./Page";
 import FieldForm from "../components/fields/FieldForm";
 import Axios from "axios";
 import notify from "../lib/notifier";
-import { FieldList } from "../components/fields/FieldList";
-import confirm from "../lib/confirmation";
 
 const fieldCreatedSuccesfully = { content: 'Field created successfully', variant: 'success' };
 const fieldCreatedError = { content: 'Failed when creating the field', variant: 'error' };
@@ -14,29 +12,18 @@ const fieldCreatedError = { content: 'Failed when creating the field', variant: 
 const fieldEditedSuccesfully = { content: 'Field edited successfully', variant: 'success' };
 const fieldEditedError = { content: 'Failed when editing the field', variant: 'error' };
 
-const fieldDeletedSuccessfully = { content: 'Field deleted successfully', variant: 'success' };
-const fieldDeletedError = { content: 'Failed when deleting the field', variant: 'error' };
-
-
-class FieldEditor extends React.Component {
+class FieldInFieldEditor extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
             field: { id: null },
-            type: undefined,
-            fields: [],
-            attributes: [],
             errors: {}
         }
 
         this.getDataFromEndpoint = this.getDataFromEndpoint.bind(this);
         this.onFieldSubmit = this.onFieldSubmit.bind(this);
         this.onChangeType = this.onChangeType.bind(this);
-
-        this.onFieldAdd = this.onFieldAdd.bind(this);
-        this.onFieldDelete = this.onFieldDelete.bind(this);
-        this.onFieldEdit = this.onFieldEdit.bind(this);
     }
 
     async componentDidMount() {
@@ -44,22 +31,16 @@ class FieldEditor extends React.Component {
     }
 
     async getDataFromEndpoint() {
-        const fieldId = this.props.match.params["fieldId"];
-        const blockId = this.props.match.params["blockId"];
+        const fieldId1 = this.props.match.params["fieldId1"];
+        const fieldId2 = this.props.match.params["fieldId2"];
 
-        if (fieldId) {
-            Promise.all([Axios.get(`/api/blocks/${blockId}/fields/${fieldId}`),
-            Axios.get(`/api/fields/${fieldId}/fields`)])
-                .then(responses => {
+        if (fieldId2)
+            Axios.get(`/api/blocks/${fieldId1}/fields/${fieldId2}`)
+                .then(response => {
                     this.setState({
-                        field: responses[0].data,
-                        type: responses[0].data.type,
-                        fields: responses[1].data
+                        field: response.data,
                     });
                 });
-        }
-
-
     }
 
     onChangeType(type) {
@@ -79,11 +60,11 @@ class FieldEditor extends React.Component {
     }
 
     onFieldSubmit(field) {
-        const fieldId = this.props.match.params["fieldId"];
-        const blockId = this.props.match.params["blockId"];
+        const fieldId1 = this.props.match.params["fieldId1"];
+        const fieldId2 = this.props.match.params["fieldId2"];
 
-        if (!fieldId)
-            Axios.post(`/api/blocks/${blockId}/fields`, field)
+        if (!fieldId2)
+            Axios.post(`/api/fields/${fieldId1}/fields`, field)
                 .then(response => notify(fieldCreatedSuccesfully))
                 .catch(error => {
                     this.setState({
@@ -92,7 +73,7 @@ class FieldEditor extends React.Component {
                     notify(fieldCreatedError);
                 })
         else
-            Axios.put(`/api/blocks/${blockId}/fields/${fieldId}`, field)
+            Axios.put(`/api/fields/${fieldId1}/fields/${fieldId2}`, field)
                 .then(response => notify(fieldEditedSuccesfully))
                 .catch(error => {
                     this.setState({
@@ -102,33 +83,9 @@ class FieldEditor extends React.Component {
                 })
     }
 
-    onFieldAdd() {
-        const fieldId1 = this.props.match.params["fieldId"];
-        this.props.history.push(`/fields/${fieldId1}/fields/new`)
-    }
-
-    onFieldDelete(rowData) {
-        confirm(() => {
-            const fieldId1 = this.props.match.params["fieldId"];
-            Axios.delete(`/api/fields/${fieldId1}/fields/${rowData.id}`)
-                .then(response => {
-                    this.getDataFromEndpoint();
-                    notify(fieldDeletedSuccessfully)
-                })
-                .catch(error => notify(fieldDeletedError));
-        })
-    }
-
-    onFieldEdit(rowData) {
-        const fieldId1 = this.props.match.params["fieldId"];
-        this.props.history.push(`/fields/${fieldId1}/fields/edit/${rowData.id}`)
-    }
-
     render() {
-        const fieldId = this.props.match.params["fieldId"];
+        const fieldId2 = this.props.match.params["fieldId2"];
 
-
-        console.log(!fieldId && this.state.type !== "ComplexType")
         return (<Page>
 
             <Grid container justify="center" spacing={24}>
@@ -136,18 +93,18 @@ class FieldEditor extends React.Component {
                 <Grid item container xs={12} md={12} lg={8} xl={5} spacing={24} justify="center">
                     <Grid item xs={12}>
                         <Typography variant="h5" align="center">
-                            {fieldId ? "Editing" : "New"} field {fieldId}
+                            {fieldId2 ? "Editing" : "New"} field {fieldId2}
                         </Typography>
                     </Grid>
 
                     <Grid item xs={12}>
                         <Divider variant="fullWidth" />
                         <Typography variant="h6">Field Data</Typography>
-                        <Typography hidden={fieldId} gutterBottom>
+                        <Typography hidden={fieldId2} gutterBottom>
                             Fill the name of the field, and its type. Once you have selected a type and a generation, the options will be displayed.
                         </Typography>
-                        <Typography hidden={fieldId} gutterBottom>
-                            If the type is complex or you have chosen the CustomBehaviour generation, then once you create the field you will be able to
+                        <Typography hidden={fieldId2} gutterBottom>
+                            If you have chosen the CustomBehaviour generation, then once you create the field you will be able to
                             add the related fields.
                         </Typography>
                         <Paper style={{ padding: 15 }}>
@@ -158,18 +115,11 @@ class FieldEditor extends React.Component {
                                         onSubmit={this.onFieldSubmit}
                                         onChangeType={this.onChangeType}
                                         errors={this.state.errors}
-                                        allowComplex />
+                                        allowComplex={false} />
                                 </Grid>
                             </Grid>
                         </Paper>
                     </Grid>
-                    <Grid item xs={12} hidden={!(fieldId && (this.state.field.type === "ComplexType" || this.state.type === 'ComplexType'))}>
-                        <FieldList fields={this.state.fields}
-                            onAdd={this.onFieldAdd}
-                            onEdit={this.onFieldEdit}
-                            onDelete={this.onFieldDelete} />
-                    </Grid>
-
                 </Grid>
             </Grid>
 
@@ -178,4 +128,4 @@ class FieldEditor extends React.Component {
 
 }
 
-export default withRouter(FieldEditor);
+export default withRouter(FieldInFieldEditor);

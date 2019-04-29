@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Grid, Paper, Typography } from '@material-ui/core';
+import { Grid, Typography } from '@material-ui/core';
 import { connect } from 'react-redux';
 import Axios from 'axios';
 import { withRouter } from 'react-router-dom';

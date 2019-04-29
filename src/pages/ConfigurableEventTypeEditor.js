@@ -1,7 +1,6 @@
 import * as React from "react";
 import Axios from "axios";
-import { Paper, Grid, Typography, Divider, Button } from "@material-ui/core";
-import ChevronLeft from '@material-ui/icons/ChevronLeft';
+import { Paper, Grid, Typography, Divider } from "@material-ui/core";
 import { withRouter } from 'react-router'
 import ConfigurableEventTypeForm from "../components/configurableEventTypes/ConfigurableEventTypeForm";
 import { BlockList } from "../components/blocks/BlockList";
