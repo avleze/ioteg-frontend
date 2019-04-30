@@ -30,7 +30,7 @@ const variableDeletedError = { content: 'Failed when deleting the variable', var
 const ruleDeletedSuccessfully = { content: 'Rule deleted successfully', variant: 'success' };
 const ruleDeletedError = { content: 'Failed when deleting the rule', variant: 'error' };
 
-class FieldEditor extends React.Component {
+class FieldInOptionalFieldsEditor extends React.Component {
 
     constructor(props) {
         super(props);
@@ -73,10 +73,10 @@ class FieldEditor extends React.Component {
 
     async getDataFromEndpoint() {
         const fieldId = this.props.match.params["fieldId"];
-        const blockId = this.props.match.params["blockId"];
+        const optionalFieldsId = this.props.match.params["optionalFieldsId"];
 
         if (fieldId) {
-            Promise.all([Axios.get(`/api/blocks/${blockId}/fields/${fieldId}`),
+            Promise.all([Axios.get(`/api/optionalFields/${optionalFieldsId}/fields/${fieldId}`),
             Axios.get(`/api/fields/${fieldId}/fields`),
             Axios.get(`/api/fields/${fieldId}/attributes`)])
                 .then(responses => {
@@ -127,10 +127,10 @@ class FieldEditor extends React.Component {
 
     onFieldSubmit(field) {
         const fieldId = this.props.match.params["fieldId"];
-        const blockId = this.props.match.params["blockId"];
+        const optionalFieldsId = this.props.match.params["optionalFieldsId"];
 
         if (!fieldId)
-            Axios.post(`/api/blocks/${blockId}/fields`, field)
+            Axios.post(`/api/optionalFields/${optionalFieldsId}/fields`, field)
                 .then(response => notify(fieldCreatedSuccesfully))
                 .catch(error => {
                     this.setState({
@@ -139,7 +139,7 @@ class FieldEditor extends React.Component {
                     notify(fieldCreatedError);
                 })
         else
-            Axios.put(`/api/blocks/${blockId}/fields/${fieldId}`, field)
+            Axios.put(`/api/optionalFields/${optionalFieldsId}/fields/${fieldId}`, field)
                 .then(response => notify(fieldEditedSuccesfully))
                 .catch(error => {
                     this.setState({
@@ -313,4 +313,4 @@ class FieldEditor extends React.Component {
 
 }
 
-export default withRouter(FieldEditor);
+export default withRouter(FieldInOptionalFieldsEditor);

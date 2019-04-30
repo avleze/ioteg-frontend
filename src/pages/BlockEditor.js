@@ -12,6 +12,9 @@ import Page from "./Page";
 const fieldDeleteSuccess = { content: 'Field deleted successfully.' }
 const fieldDeleteError = { content: 'Failed when deleting the field.' }
 
+const optionalFieldDeleteSuccess = { content: 'OptionalFields deleted successfully.' }
+const optionalFieldDeleteError = { content: 'Failed when deleting the OptionalFields.' }
+
 class BlockEditor extends React.Component {
 
     constructor(props) {
@@ -27,6 +30,10 @@ class BlockEditor extends React.Component {
         this.onFieldAdd = this.onFieldAdd.bind(this);
         this.onFieldEdit = this.onFieldEdit.bind(this);
 
+        this.onOptionalFieldsAdd = this.onOptionalFieldsAdd.bind(this);
+        this.onOptionalFieldsDelete = this.onOptionalFieldsDelete.bind(this);
+        this.onOptionalFieldsEdit = this.onOptionalFieldsEdit.bind(this);
+
         this.getDataFromEndpoint = this.getDataFromEndpoint.bind(this);
     }
 
@@ -39,14 +46,14 @@ class BlockEditor extends React.Component {
         const blockId = this.props.match.params["blockId"];
         if (blockId) {
             Promise.all([Axios.get(`/api/events/${eventId}/blocks/${blockId}`),
-            Axios.get(`/api/blocks/${blockId}/fields`)
+            Axios.get(`/api/blocks/${blockId}/fields`),
+            Axios.get(`/api/blocks/${blockId}/optionalFields`)
             ])
                 .then(responses => {
-                    console.log(responses);
                     this.setState({
                         block: responses[0].data,
                         fields: responses[1].data,
-                        //optionalFields: responses[2].data
+                        optionalFields: responses[2].data
                     })
                 })
 
@@ -70,10 +77,34 @@ class BlockEditor extends React.Component {
             Axios.delete(`/api/blocks/${blockId}/fields/${fieldId}`)
                 .then(response => {
                     this.getDataFromEndpoint();
+                    notify(optionalFieldDeleteSuccess)
+                })
+                .catch(error => notify(optionalFieldDeleteError));
+        })
+    }
+
+    onOptionalFieldsAdd() {
+        const blockId = this.props.match.params["blockId"];
+        this.props.history.push(`/blocks/${blockId}/optionalFields/new`)
+    }
+
+    onOptionalFieldsDelete(rowData) {
+        const blockId = this.props.match.params["blockId"];
+        const optionalFieldsId = rowData.id;
+        confirm(() => {
+            Axios.delete(`/api/blocks/${blockId}/optionalFields/${optionalFieldsId}`)
+                .then(response => {
+                    this.getDataFromEndpoint();
                     notify(fieldDeleteSuccess)
                 })
                 .catch(error => notify(fieldDeleteError));
         })
+    }
+
+    onOptionalFieldsEdit(rowData) {
+        const blockId = this.props.match.params["blockId"];
+        const optionalFieldsId = rowData.id;
+        this.props.history.push(`/blocks/${blockId}/optionalFields/edit/${optionalFieldsId}`)
     }
 
     render() {
@@ -110,7 +141,10 @@ class BlockEditor extends React.Component {
                             onDelete={this.onFieldDelete} />
                     </Grid>
                     <Grid item xs={12} hidden={!blockId}>
-                        <OptionalFieldsList optionalFields={this.state.optionalFields} />
+                        <OptionalFieldsList optionalFields={this.state.optionalFields}
+                            onAdd={this.onOptionalFieldsAdd}
+                            onEdit={this.onOptionalFieldsEdit}
+                            onDelete={this.onOptionalFieldsDelete} />
                     </Grid>
                 </Grid>
             </Grid>

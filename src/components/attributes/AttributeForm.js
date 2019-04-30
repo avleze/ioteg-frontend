@@ -1,24 +1,11 @@
 import * as React from 'react'
 import { TextField, Button, Grid, FormHelperText, MenuItem, Typography, FormControlLabel, Switch } from '@material-ui/core';
 import { withRouter } from 'react-router-dom';
-import { propertiesByType, generationsByType, fieldsByTypeAndGeneration } from './fieldsConstants';
-import confirm from '../../lib/confirmation';
-import _ from 'lodash';
+import { propertiesByType, generationsByType, fieldsByTypeAndGeneration } from './attributesConstants';
 
 const items = ["Integer", "Float", "Long", "String", "Time", "Date", "Alphanumeric", "Boolean"];
-const itemsWithComplexType = [...items, "ComplexType"];
 
 const formFields = [
-    {
-        id: "name",
-        name: "name",
-        type: "text",
-        label: "Field Name",
-        errorField: "name",
-        xs: 12,
-        md: 6,
-        lg: 6
-    },
     {
         id: "type",
         name: "type",
@@ -29,41 +16,14 @@ const formFields = [
         xs: 12,
         md: 6,
         lg: 6
-    },
-    {
-        id: "quotes",
-        name: "quotes",
-        type: "switch",
-        label: "Has quotes",
-        errorField: "quotes",
-        xs: 12,
-        md: 6,
-        lg: 6
-    },
-    {
-        id: "injectable",
-        name: "injectable",
-        type: "switch",
-        label: "Is injectable",
-        errorField: "injectable",
-        xs: 12,
-        md: 6,
-        lg: 6
-    },
-
+    }
 ]
 
-
-class FieldForm extends React.Component {
+class AttributeForm extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            name: null,
-            quotes: false,
-            chooseone: false,
-            dependence: "false",
-            injectable: false,
             type: null,
             value: null,
             min: 0,
@@ -78,7 +38,6 @@ class FieldForm extends React.Component {
             endcharacter: null,
             format: null,
             isNumeric: false,
-            customBehaviour: null
         };
 
         this.onSubmit = this.onSubmit.bind(this);
@@ -87,36 +46,27 @@ class FieldForm extends React.Component {
     }
 
     componentDidMount() {
-        if (this.props.field) {
+        if (this.props.attribute) {
             this.setState({
-                ...this.props.field
+                ...this.props.attribute
             })
         }
     }
 
     onSubmit(e) {
         e.preventDefault();
-        confirm(() => {
-            this.props.onSubmit(this.state);
-        })
+        this.props.onSubmit(this.state);
     }
 
     onFieldChange(e) {
         let value = {
+            [e.target.name]: e.target.value,
             errors: {}
         }
-        _.set(value, e.target.name, e.target.value)
-
 
         if (e.target.name === 'type') {
             this.props.onChangeType(e.target.value)
-            if (e.target.value !== 'ComplexType')
-                value['generationType'] = 'Fixed';
-            else
-                value['generationType'] = 'Complex';
-
-            if (e.target.value !== "Float")
-                value['customBehaviour'] = null;
+            value['generationType'] = 'Fixed';
         }
 
         if (e.target.name === 'generationType') {
@@ -127,14 +77,7 @@ class FieldForm extends React.Component {
             value['value'] = null;
             value['min'] = 0;
             value['max'] = 10;
-
-            this.props.onChangeGenerationType(e.target.value);
-
-            if (e.target.value !== "CustomBehaviour")
-                value['customBehaviour'] = null;
         }
-
-
 
         this.setState({
             ...value
@@ -148,11 +91,6 @@ class FieldForm extends React.Component {
     renderFields(fields) {
 
         return fields.map((formField, key) => {
-            if (formField.name === "type" && this.props.allowComplex)
-                formField.items = itemsWithComplexType;
-            else if (formField.name === "type")
-                formField.items = items;
-
             if (formField.type === 'switch') {
                 return <FormControlLabel
                     control={
@@ -172,7 +110,7 @@ class FieldForm extends React.Component {
                         variant="outlined"
                         name={formField.name}
                         type={formField.type}
-                        value={_.get(this.state, formField.name) !== null ? _.get(this.state, formField.name) : ""}
+                        value={this.state[formField.name] !== null ? this.state[formField.name] : ""}
                         onChange={this.onFieldChange}
                         fullWidth
                         error={this.props.errors[formField.errorField]}>
@@ -252,4 +190,4 @@ class FieldForm extends React.Component {
     }
 }
 
-export default withRouter(FieldForm);
+export default withRouter(AttributeForm);

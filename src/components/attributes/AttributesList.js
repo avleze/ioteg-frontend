@@ -2,9 +2,9 @@ import * as React from "react";
 import propTypes from 'prop-types';
 import { CustomMaterialTable } from "../utils/CustomMaterialTable";
 
-const optionalFieldsColumns = [
-    { title: 'Mandatory', field: 'mandatory', type: "boolean" },
-    { title: 'Fields', field: 'fields' },
+const attributeColumns = [
+    { title: 'Type', field: 'type', type: 'string' },
+    { title: 'Generation', field: 'generationType', type: 'string' },
 ]
 
 
@@ -14,25 +14,25 @@ const options = {
 };
 
 
-export class OptionalFieldsList extends React.Component {
+export class AttributeList extends React.Component {
 
     actions = [{
         icon: 'edit',
-        tooltip: 'Edit optional fields',
+        tooltip: 'Edit attribute',
         onClick: (event, rowData) => {
             this.props.onEdit(rowData);
         },
     },
     {
         icon: 'delete',
-        tooltip: 'Delete optional fields',
+        tooltip: 'Delete attribute',
         onClick: (event, rowData) => {
             this.props.onDelete(rowData)
         },
     },
     {
         icon: 'add',
-        tooltip: 'Add optional fields',
+        tooltip: 'Add attribute',
         isFreeAction: true,
         onClick: (event) => {
             this.props.onAdd();
@@ -41,16 +41,16 @@ export class OptionalFieldsList extends React.Component {
 
 
     render() {
-        return (<CustomMaterialTable data={this.props.optionalFields}
-            columns={optionalFieldsColumns}
-            title="Optional Fields"
+        return (<CustomMaterialTable data={this.props.attributes}
+            columns={attributeColumns}
+            title="Attributes"
             actions={this.actions}
             options={options} />)
     }
 }
 
-OptionalFieldsList.propTypes = {
-    optionalFields: propTypes.arrayOf(propTypes.object).isRequired,
+AttributeList.propTypes = {
+    attributes: propTypes.arrayOf(propTypes.object).isRequired,
     onEdit: propTypes.func.isRequired,
     onAdd: propTypes.func.isRequired,
     onDelete: propTypes.func.isRequired

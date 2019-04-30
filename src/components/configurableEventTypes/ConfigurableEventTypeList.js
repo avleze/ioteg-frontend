@@ -38,6 +38,14 @@ export class ConfigurableEventTypeList extends React.Component {
         onClick: (event) => {
             this.props.onAdd();
         },
+    },
+    {
+        icon: 'cloud_download',
+        tooltip: 'Generate as JSON, CSV or XML',
+        isFreeAction: false,
+        onClick: (event, rowData) => {
+            this.props.onGenerate(rowData);
+        },
     }];
 
 
@@ -55,5 +63,6 @@ ConfigurableEventTypeList.propTypes = {
     configurableEventTypes: propTypes.arrayOf(propTypes.object).isRequired,
     onEdit: propTypes.func.isRequired,
     onAdd: propTypes.func.isRequired,
-    onDelete: propTypes.func.isRequired
+    onDelete: propTypes.func.isRequired,
+    onGenerate: propTypes.func.isRequired
 }

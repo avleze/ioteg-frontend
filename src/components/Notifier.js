@@ -112,7 +112,6 @@ class Notifier extends React.Component {
   };
 
   openSnackbar = (message) => {
-      console.log(JSON.stringify(message))
       this.setState({ open: true, message });
   };
 

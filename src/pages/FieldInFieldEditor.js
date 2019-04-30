@@ -43,6 +43,7 @@ class FieldInFieldEditor extends React.Component {
                 });
     }
 
+    
     onChangeType(type) {
         this.setState({
             type: type
@@ -103,10 +104,6 @@ class FieldInFieldEditor extends React.Component {
                         <Typography hidden={fieldId2} gutterBottom>
                             Fill the name of the field, and its type. Once you have selected a type and a generation, the options will be displayed.
                         </Typography>
-                        <Typography hidden={fieldId2} gutterBottom>
-                            If you have chosen the CustomBehaviour generation, then once you create the field you will be able to
-                            add the related fields.
-                        </Typography>
                         <Paper style={{ padding: 15 }}>
                             <Grid container>
                                 <Grid item xs>
@@ -114,6 +111,7 @@ class FieldInFieldEditor extends React.Component {
                                         key={this.state.field.id}
                                         onSubmit={this.onFieldSubmit}
                                         onChangeType={this.onChangeType}
+                                        onChangeGenerationType={() => {}}
                                         errors={this.state.errors}
                                         allowComplex={false} />
                                 </Grid>

@@ -5,7 +5,6 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import PrivateRoute from '../components/routing/PrivateRoute';
 import Notifier from '../components/Notifier';
 import { ConfirmationDialog } from '../components/ConfirmationDialog';
-import FieldInFieldEditor from './FieldInFieldEditor';
 
 const FieldEditor = React.lazy(() => import('../pages/FieldEditor'));
 const ConfigurableEventTypeEditor = React.lazy(() => import('../pages/ConfigurableEventTypeEditor'))
@@ -15,6 +14,12 @@ const SignIn = React.lazy(() => import('../components/users/SignIn'));
 const SignUp = React.lazy(() => import('../components/users/SignUp'));
 const ProfilePage = React.lazy(() => import('../pages/ProfilePage'));
 const MyChannelsPage = React.lazy(() => import('../pages/MyChannelsPage'));
+const FieldInFieldEditor = React.lazy(() => import('./FieldInFieldEditor'));
+const AttributeEditor = React.lazy(() => import('./AttributeEditor'));
+const RuleEditor = React.lazy(() => import('./RuleEditor'));
+const VariableEditor = React.lazy(() => import('./VariableEditor'));
+const OptionalFieldsEditor = React.lazy(() => import('./OptionalFieldsEditor'));
+const FieldInOptionalFieldsEditor = React.lazy(() => import('./FieldInOptionalFieldsEditor'));
 
 function WaitingComponent(Component) {
     return props => (
@@ -50,16 +55,21 @@ export default class App extends React.Component {
                             
                             <PrivateRoute exact path="/blocks/:blockId/fields/edit/:fieldId" component={WaitingComponent(FieldEditor)} />
                             <PrivateRoute exact path="/blocks/:blockId/fields/new" component={WaitingComponent(FieldEditor)} />
-                            <PrivateRoute exact path="/blocks/:blockId/optionalFields/edit/:optionalFieldsId" component={WaitingComponent(ChannelEditor)} />
-                            <PrivateRoute exact path="/blocks/:blockId/optionalFields/new" component={WaitingComponent(ChannelEditor)} />
-                            
-                            <PrivateRoute exact path="/optionalFields/:optionalFieldsId/fields/edit/:fieldId" component={WaitingComponent(ChannelEditor)} />
-                            <PrivateRoute exact path="/optionalFields/:optionalFieldsId/fields/new" component={WaitingComponent(ChannelEditor)} />
+                            <PrivateRoute exact path="/blocks/:blockId/optionalFields/edit/:optionalFieldsId" component={WaitingComponent(OptionalFieldsEditor)} />
+                            <PrivateRoute exact path="/blocks/:blockId/optionalFields/new" component={WaitingComponent(OptionalFieldsEditor)} />
+                            OptionalFieldsEditor
+                            <PrivateRoute exact path="/optionalFields/:optionalFieldsId/fields/edit/:fieldId" component={WaitingComponent(FieldInOptionalFieldsEditor)} />
+                            <PrivateRoute exact path="/optionalFields/:optionalFieldsId/fields/new" component={WaitingComponent(FieldInOptionalFieldsEditor)} />
                             
                             <PrivateRoute exact path="/fields/:fieldId1/fields/edit/:fieldId2" component={WaitingComponent(FieldInFieldEditor)} />
                             <PrivateRoute exact path="/fields/:fieldId1/fields/new" component={WaitingComponent(FieldInFieldEditor)} />
-                            <PrivateRoute exact path="/fields/:fieldId/attributes/edit/:attributeId" component={WaitingComponent(ChannelEditor)} />
-                            <PrivateRoute exact path="/fields/:fieldId/attributes/new" component={WaitingComponent(ChannelEditor)} />
+                            <PrivateRoute exact path="/fields/:fieldId/attributes/edit/:attributeId" component={WaitingComponent(AttributeEditor)} />
+                            <PrivateRoute exact path="/fields/:fieldId/attributes/new" component={WaitingComponent(AttributeEditor)} />
+
+                            <PrivateRoute exact path="/customBehaviour/:customBehaviourId/variables/edit/:variableId" component={WaitingComponent(VariableEditor)} />
+                            <PrivateRoute exact path="/customBehaviour/:customBehaviourId/variables/new" component={WaitingComponent(VariableEditor)} />
+                            <PrivateRoute exact path="/customBehaviour/:customBehaviourId/rules/edit/:ruleId" component={WaitingComponent(RuleEditor)} />
+                            <PrivateRoute exact path="/customBehaviour/:customBehaviourId/rules/new" component={WaitingComponent(RuleEditor)} />
                         </Switch>
                     </div>
                     <Notifier/>

@@ -2,9 +2,11 @@ import * as React from "react";
 import propTypes from 'prop-types';
 import { CustomMaterialTable } from "../utils/CustomMaterialTable";
 
-const optionalFieldsColumns = [
-    { title: 'Mandatory', field: 'mandatory', type: "boolean" },
-    { title: 'Fields', field: 'fields' },
+const variableColumns = [
+    { title: 'Variable Name', field: 'name', type: 'string'},
+    { title: 'Minimum', field: 'min', type: 'string' },
+    { title: 'Maximum', field: 'max', type: 'string' },
+    { title: 'Value', field: 'value', type: 'string' },
 ]
 
 
@@ -14,25 +16,25 @@ const options = {
 };
 
 
-export class OptionalFieldsList extends React.Component {
+export class VariableCustomBehaviourList extends React.Component {
 
     actions = [{
         icon: 'edit',
-        tooltip: 'Edit optional fields',
+        tooltip: 'Edit variable',
         onClick: (event, rowData) => {
             this.props.onEdit(rowData);
         },
     },
     {
         icon: 'delete',
-        tooltip: 'Delete optional fields',
+        tooltip: 'Delete variable',
         onClick: (event, rowData) => {
             this.props.onDelete(rowData)
         },
     },
     {
         icon: 'add',
-        tooltip: 'Add optional fields',
+        tooltip: 'Add variable',
         isFreeAction: true,
         onClick: (event) => {
             this.props.onAdd();
@@ -41,16 +43,16 @@ export class OptionalFieldsList extends React.Component {
 
 
     render() {
-        return (<CustomMaterialTable data={this.props.optionalFields}
-            columns={optionalFieldsColumns}
-            title="Optional Fields"
+        return (<CustomMaterialTable data={this.props.variables}
+            columns={variableColumns}
+            title="Variables"
             actions={this.actions}
             options={options} />)
     }
 }
 
-OptionalFieldsList.propTypes = {
-    optionalFields: propTypes.arrayOf(propTypes.object).isRequired,
+VariableCustomBehaviourList.propTypes = {
+    variables: propTypes.arrayOf(propTypes.object).isRequired,
     onEdit: propTypes.func.isRequired,
     onAdd: propTypes.func.isRequired,
     onDelete: propTypes.func.isRequired

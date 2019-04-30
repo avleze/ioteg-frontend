@@ -21,6 +21,9 @@ const theme = createMuiTheme({
         fontSize: 16,
     },
     palette: {
+        secondary:{
+            main: "#c79c00"
+        } ,
         background: {
             paper: "#fcfcfc"
         }

@@ -50,7 +50,6 @@ class BlockForm extends React.Component {
     }
 
     componentDidMount() {
-        console.log(this.props.block)
         if (this.props.block)
             this.setState({
                 ...this.props.block
