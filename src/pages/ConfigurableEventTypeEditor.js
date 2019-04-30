@@ -110,7 +110,6 @@ class ConfigurableEventTypeEditor extends React.Component {
                     </Grid>
 
                 </Grid>
-
             </Page>
         )
     }
