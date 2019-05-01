@@ -46,6 +46,14 @@ export class ConfigurableEventTypeList extends React.Component {
         onClick: (event, rowData) => {
             this.props.onGenerate(rowData);
         },
+    },
+    {
+        icon: 'settings_remote',
+        tooltip: 'Async generation',
+        isFreeAction: false,
+        onClick: (event, rowData) => {
+            this.props.onGenerateAsync(rowData);
+        },
     }];
 
 

@@ -80,6 +80,13 @@ export default class VariableForm extends React.Component {
             errors: {}
         }
         _.set(value, e.target.name, e.target.value)
+        if(e.target.name === 'min' || e.target.name === 'max')
+            value['value'] = null;
+        if(e.target.name === 'value')
+        {
+            value['min'] = null;
+            value['max'] = null;
+        }
 
         this.setState({
             ...value

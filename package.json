@@ -6,6 +6,7 @@
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.11",
     "material-table": "^1.32.0",
+    "mqtt": "^2.18.8",
     "mui-datatables": "^2.0.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",

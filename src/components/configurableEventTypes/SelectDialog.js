@@ -41,7 +41,6 @@ export default class SelectDialog extends React.Component {
 }
 
 SelectDialog.propTypes = {
-  classes: PropTypes.object.isRequired,
   onClose: PropTypes.func,
   open: PropTypes.bool.isRequired,
   selectedValue: PropTypes.string,

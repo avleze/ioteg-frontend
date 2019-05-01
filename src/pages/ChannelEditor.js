@@ -8,6 +8,8 @@ import { ConfigurableEventTypeList } from "../components/configurableEventTypes/
 import confirm from "../lib/confirmation";
 import Page from "./Page";
 import SelectDialog from "../components/configurableEventTypes/SelectDialog";
+import AsyncGenerationDialog from "../components/configurableEventTypes/AsyncGenerationDialog";
+import { connect } from 'react-redux';
 
 const successConfigurableEventTypeDelete = { content: "Configurable event type deleted successfully", variant: "success" };
 const errorConfigurableEventTypeDelete = { content: "There was an error when deleting the configurable event type", variant: "error" };
@@ -19,7 +21,8 @@ class ChannelEditor extends React.Component {
         this.state = {
             channelName: "",
             configurableEventTypes: [],
-            chooseFormatOpened: false
+            chooseFormatOpened: false,
+            asyncGenerationOpened: false
         }
 
         this.onConfigurableEventTypeAdd = this.onConfigurableEventTypeAdd.bind(this);
@@ -69,6 +72,8 @@ class ChannelEditor extends React.Component {
     }
 
     render() {
+        const channelId = this.props.match.params["channelId"];
+
         return (<Page>
 
             <Grid container justify="center" spacing={24}>
@@ -99,11 +104,30 @@ class ChannelEditor extends React.Component {
                             onAdd={this.onConfigurableEventTypeAdd}
                             onEdit={this.onConfigurableEventTypeEdit}
                             onDelete={this.onConfigurableEventTypeDelete}
-                            onGenerate={(rowData) => { this.setState({ chooseFormatOpened: true, selected: rowData }) }} />
+                            onGenerate={(rowData) => { this.setState({ chooseFormatOpened: true, selected: rowData }) }}
+                            onGenerateAsync={(rowData) => {
+                                this.setState({
+                                    asyncGenerationOpened: true,
+                                    selectedEventId: rowData.id,
+                                    topic: `/channel/${channelId}/event/${rowData.id}/<format>/${this.props.mqttApiKey}`
+                                })
+                            }} />
                     </Grid>
                 </Grid>
 
             </Grid>
+
+            <AsyncGenerationDialog open={this.state.asyncGenerationOpened}
+                channelId={channelId}
+                eventId = {this.state.selectedEventId}
+                topic={this.state.topic}
+                key={this.state.topic}
+                onClose={() => {
+                    this.setState({
+                        asyncGenerationOpened: false,
+                    })
+                }}
+            />
 
             <SelectDialog open={this.state.chooseFormatOpened} onClose={(item) => {
                 if (item)
@@ -122,7 +146,7 @@ class ChannelEditor extends React.Component {
                             const url = window.URL.createObjectURL(new Blob([data]));
                             const link = document.createElement('a');
                             link.href = url;
-                            link.setAttribute('download', this.state.selected.eventType.name + `.${item}`.toLowerCase()); //or any other extension
+                            link.setAttribute('download', this.state.selected.eventType.name + `.${item}`.toLowerCase());
                             document.body.appendChild(link);
                             link.click();
                         });
@@ -137,4 +161,10 @@ class ChannelEditor extends React.Component {
 
 }
 
-export default withRouter(ChannelEditor);
+function mapStateToProps(state) {
+    return {
+        ...state.auth
+    }
+}
+
+export default connect(mapStateToProps)(withRouter(ChannelEditor));
