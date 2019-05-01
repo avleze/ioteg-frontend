@@ -98,33 +98,34 @@ class ChannelEditor extends React.Component {
                         <ConfigurableEventTypeList configurableEventTypes={this.state.configurableEventTypes}
                             onAdd={this.onConfigurableEventTypeAdd}
                             onEdit={this.onConfigurableEventTypeEdit}
-                            onDelete={this.onConfigurableEventTypeDelete} 
-                            onGenerate={(rowData) => {this.setState({chooseFormatOpened: true, selected: rowData})}}/>
+                            onDelete={this.onConfigurableEventTypeDelete}
+                            onGenerate={(rowData) => { this.setState({ chooseFormatOpened: true, selected: rowData }) }} />
                     </Grid>
                 </Grid>
 
             </Grid>
 
             <SelectDialog open={this.state.chooseFormatOpened} onClose={(item) => {
-                Axios.get(`/api/generation/${this.state.selected.id}`,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': `application/${item}`
-                    }
-                })
-                .then(response => {
-                    let data = response.data;
-                    if(item === 'JSON')
-                        data = JSON.stringify(data);
+                if (item)
+                    Axios.get(`/api/generation/${this.state.selected.id}`,
+                        {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': `application/${item}`.toLowerCase()
+                            }
+                        })
+                        .then(response => {
+                            let data = response.data;
+                            if (item === 'JSON')
+                                data = JSON.stringify(data, null, 2);
 
-                    const url = window.URL.createObjectURL(new Blob([data]));
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.setAttribute('download', this.state.selected.eventType.name + `.${item}`.toLowerCase()); //or any other extension
-                    document.body.appendChild(link);
-                    link.click();
-                });
+                            const url = window.URL.createObjectURL(new Blob([data]));
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.setAttribute('download', this.state.selected.eventType.name + `.${item}`.toLowerCase()); //or any other extension
+                            document.body.appendChild(link);
+                            link.click();
+                        });
 
                 this.setState({
                     chooseFormatOpened: false

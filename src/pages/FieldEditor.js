@@ -131,7 +131,10 @@ class FieldEditor extends React.Component {
 
         if (!fieldId)
             Axios.post(`/api/blocks/${blockId}/fields`, field)
-                .then(response => notify(fieldCreatedSuccesfully))
+                .then(response => {
+                    this.props.history.goBack();
+                    notify(fieldCreatedSuccesfully)
+                })
                 .catch(error => {
                     this.setState({
                         errors: this.getErrors(error)

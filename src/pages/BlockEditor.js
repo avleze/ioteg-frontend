@@ -9,11 +9,11 @@ import confirm from "../lib/confirmation";
 import notify from "../lib/notifier";
 import Page from "./Page";
 
-const fieldDeleteSuccess = { content: 'Field deleted successfully.' }
-const fieldDeleteError = { content: 'Failed when deleting the field.' }
+const fieldDeleteSuccess = { content: 'Field deleted successfully.', variant: "success" }
+const fieldDeleteError = { content: 'Failed when deleting the field.', variant: "error" }
 
-const optionalFieldDeleteSuccess = { content: 'OptionalFields deleted successfully.' }
-const optionalFieldDeleteError = { content: 'Failed when deleting the OptionalFields.' }
+const optionalFieldDeleteSuccess = { content: 'OptionalFields deleted successfully.', variant: "success" }
+const optionalFieldDeleteError = { content: 'Failed when deleting the OptionalFields.', variant: "error" }
 
 class BlockEditor extends React.Component {
 
@@ -77,9 +77,9 @@ class BlockEditor extends React.Component {
             Axios.delete(`/api/blocks/${blockId}/fields/${fieldId}`)
                 .then(response => {
                     this.getDataFromEndpoint();
-                    notify(optionalFieldDeleteSuccess)
+                    notify(fieldDeleteSuccess)
                 })
-                .catch(error => notify(optionalFieldDeleteError));
+                .catch(error => notify(fieldDeleteError));
         })
     }
 
@@ -95,9 +95,9 @@ class BlockEditor extends React.Component {
             Axios.delete(`/api/blocks/${blockId}/optionalFields/${optionalFieldsId}`)
                 .then(response => {
                     this.getDataFromEndpoint();
-                    notify(fieldDeleteSuccess)
+                    notify(optionalFieldDeleteSuccess)
                 })
-                .catch(error => notify(fieldDeleteError));
+                .catch(error => notify(optionalFieldDeleteError));
         })
     }
 
