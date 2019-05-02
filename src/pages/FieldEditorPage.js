@@ -12,24 +12,28 @@ const fieldEditedSuccesfully = { content: 'Field edited successfully', variant: 
 const fieldEditedError = { content: 'Failed when editing the field', variant: 'error' };
 
 
-class FieldInOptionalFieldsEditor extends React.Component {
+class FieldEditorPage extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
             errors: {}
         }
-        this.onFieldSubmit = this.onFieldSubmit.bind(this);
-    }
 
+        this.onFieldSubmit = this.onFieldSubmit.bind(this);
+
+    }
 
     onFieldSubmit(field) {
         const fieldId = this.props.match.params["fieldId"];
-        const optionalFieldsId = this.props.match.params["optionalFieldsId"];
+        const blockId = this.props.match.params["blockId"];
 
         if (!fieldId)
-            Axios.post(`/api/optionalFields/${optionalFieldsId}/fields`, field)
-                .then(response => notify(fieldCreatedSuccesfully))
+            Axios.post(`/api/blocks/${blockId}/fields`, field)
+                .then(response => {
+                    this.props.history.goBack();
+                    notify(fieldCreatedSuccesfully)
+                })
                 .catch(error => {
                     this.setState({
                         errors: getErrors(error)
@@ -37,7 +41,7 @@ class FieldInOptionalFieldsEditor extends React.Component {
                     notify(fieldCreatedError);
                 })
         else
-            Axios.put(`/api/optionalFields/${optionalFieldsId}/fields/${fieldId}`, field)
+            Axios.put(`/api/blocks/${blockId}/fields/${fieldId}`, field)
                 .then(response => notify(fieldEditedSuccesfully))
                 .catch(error => {
                     this.setState({
@@ -47,16 +51,15 @@ class FieldInOptionalFieldsEditor extends React.Component {
                 })
     }
 
-
     render() {
+
         const fieldId = this.props.match.params["fieldId"];
-        const optionalFieldsId = this.props.match.params["optionalFieldsId"];
-        
-        const getFieldURL = `/api/optionalFields/${optionalFieldsId}/fields/${fieldId}`;
+        const blockId = this.props.match.params["blockId"];
+        const getFieldURL = `/api/blocks/${blockId}/fields/${fieldId}`;
 
         return (<FieldEditor getFieldURL={getFieldURL} onSubmit={this.onFieldSubmit} fieldId={fieldId} errors={this.state.errors} allowComplex/>)
     }
 
 }
 
-export default withRouter(FieldInOptionalFieldsEditor);
+export default withRouter(FieldEditorPage);

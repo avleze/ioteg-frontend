@@ -6,7 +6,7 @@ import PrivateRoute from '../components/routing/PrivateRoute';
 import Notifier from '../components/Notifier';
 import { ConfirmationDialog } from '../components/ConfirmationDialog';
 
-const FieldEditor = React.lazy(() => import('../pages/FieldEditor'));
+const FieldEditorPage = React.lazy(() => import('../pages/FieldEditorPage'));
 const ConfigurableEventTypeEditor = React.lazy(() => import('../pages/ConfigurableEventTypeEditor'))
 const ChannelEditor = React.lazy(() => import('../pages/ChannelEditor'));
 const BlockEditor = React.lazy(() => import('../pages/BlockEditor'));
@@ -53,8 +53,8 @@ export default class App extends React.Component {
                             <PrivateRoute exact path="/events/:eventTypeId/blocks/edit/:blockId" component={WaitingComponent(BlockEditor)} />
                             <PrivateRoute exact path="/events/:eventTypeId/blocks/new" component={WaitingComponent(BlockEditor)} />
                             
-                            <PrivateRoute exact path="/blocks/:blockId/fields/edit/:fieldId" component={WaitingComponent(FieldEditor)} />
-                            <PrivateRoute exact path="/blocks/:blockId/fields/new" component={WaitingComponent(FieldEditor)} />
+                            <PrivateRoute exact path="/blocks/:blockId/fields/edit/:fieldId" component={WaitingComponent(FieldEditorPage)} />
+                            <PrivateRoute exact path="/blocks/:blockId/fields/new" component={WaitingComponent(FieldEditorPage)} />
                             <PrivateRoute exact path="/blocks/:blockId/optionalFields/edit/:optionalFieldsId" component={WaitingComponent(OptionalFieldsEditor)} />
                             <PrivateRoute exact path="/blocks/:blockId/optionalFields/new" component={WaitingComponent(OptionalFieldsEditor)} />
                             OptionalFieldsEditor

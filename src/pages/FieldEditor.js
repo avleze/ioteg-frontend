@@ -12,12 +12,6 @@ import { VariableCustomBehaviourList } from "../components/custom_behaviour/Vari
 import { RuleCustomBehaviourList } from "../components/custom_behaviour/RuleCustomBehaviourList";
 import _ from 'lodash';
 
-const fieldCreatedSuccesfully = { content: 'Field created successfully', variant: 'success' };
-const fieldCreatedError = { content: 'Failed when creating the field', variant: 'error' };
-
-const fieldEditedSuccesfully = { content: 'Field edited successfully', variant: 'success' };
-const fieldEditedError = { content: 'Failed when editing the field', variant: 'error' };
-
 const fieldDeletedSuccessfully = { content: 'Field deleted successfully', variant: 'success' };
 const fieldDeletedError = { content: 'Failed when deleting the field', variant: 'error' };
 
@@ -72,11 +66,10 @@ class FieldEditor extends React.Component {
     }
 
     async getDataFromEndpoint() {
-        const fieldId = this.props.match.params["fieldId"];
-        const blockId = this.props.match.params["blockId"];
+        const fieldId = this.props.fieldId
 
         if (fieldId) {
-            Promise.all([Axios.get(`/api/blocks/${blockId}/fields/${fieldId}`),
+            Promise.all([Axios.get(this.props.getFieldURL),
             Axios.get(`/api/fields/${fieldId}/fields`),
             Axios.get(`/api/fields/${fieldId}/attributes`)])
                 .then(responses => {
@@ -115,51 +108,18 @@ class FieldEditor extends React.Component {
         });
     }
 
-    getErrors(error) {
-        let errors = {};
-
-        error.response.data["subErrors"].forEach(error => {
-            errors[error.field] = error.message;
-        });
-
-        return errors;
-    }
-
     onFieldSubmit(field) {
-        const fieldId = this.props.match.params["fieldId"];
-        const blockId = this.props.match.params["blockId"];
-
-        if (!fieldId)
-            Axios.post(`/api/blocks/${blockId}/fields`, field)
-                .then(response => {
-                    this.props.history.goBack();
-                    notify(fieldCreatedSuccesfully)
-                })
-                .catch(error => {
-                    this.setState({
-                        errors: this.getErrors(error)
-                    });
-                    notify(fieldCreatedError);
-                })
-        else
-            Axios.put(`/api/blocks/${blockId}/fields/${fieldId}`, field)
-                .then(response => notify(fieldEditedSuccesfully))
-                .catch(error => {
-                    this.setState({
-                        errors: this.getErrors(error)
-                    });
-                    notify(fieldEditedError)
-                })
+        this.props.onSubmit(field);
     }
 
     onFieldAdd() {
-        const fieldId1 = this.props.match.params["fieldId"];
+        const fieldId1 = this.props.fieldId;
         this.props.history.push(`/fields/${fieldId1}/fields/new`)
     }
 
     onFieldDelete(rowData) {
         confirm(() => {
-            const fieldId1 = this.props.match.params["fieldId"];
+            const fieldId1 = this.props.fieldId;
             Axios.delete(`/api/fields/${fieldId1}/fields/${rowData.id}`)
                 .then(response => {
                     this.getDataFromEndpoint();
@@ -170,18 +130,18 @@ class FieldEditor extends React.Component {
     }
 
     onFieldEdit(rowData) {
-        const fieldId1 = this.props.match.params["fieldId"];
+        const fieldId1 = this.props.fieldId;
         this.props.history.push(`/fields/${fieldId1}/fields/edit/${rowData.id}`)
     }
 
     onAttributeAdd() {
-        const fieldId = this.props.match.params["fieldId"];
+        const fieldId = this.props.fieldId;
         this.props.history.push(`/fields/${fieldId}/attributes/new`)
     }
 
     onAttributeDelete(rowData) {
         confirm(() => {
-            const fieldId = this.props.match.params["fieldId"];
+            const fieldId = this.props.fieldId;
             Axios.delete(`/api/fields/${fieldId}/attributes/${rowData.id}`)
                 .then(response => {
                     this.getDataFromEndpoint();
@@ -192,7 +152,7 @@ class FieldEditor extends React.Component {
     }
 
     onAttributeEdit(rowData) {
-        const fieldId = this.props.match.params["fieldId"];
+        const fieldId = this.props.fieldId;
         this.props.history.push(`/fields/${fieldId}/attributes/edit/${rowData.id}`);
     }
 
@@ -246,7 +206,7 @@ class FieldEditor extends React.Component {
     }
 
     render() {
-        const fieldId = this.props.match.params["fieldId"];
+        const fieldId = this.props.fieldId;
         const customBehaviourId = _.get(this.state, 'field.customBehaviour.id');
 
         return (<Page>
@@ -278,8 +238,8 @@ class FieldEditor extends React.Component {
                                         onSubmit={this.onFieldSubmit}
                                         onChangeType={this.onChangeType}
                                         onChangeGenerationType={this.onChangeGenerationType}
-                                        errors={this.state.errors}
-                                        allowComplex />
+                                        errors={this.props.errors}
+                                        allowComplex={this.props.allowComplex} />
                                 </Grid>
                             </Grid>
                         </Paper>
@@ -315,5 +275,6 @@ class FieldEditor extends React.Component {
     }
 
 }
+
 
 export default withRouter(FieldEditor);
