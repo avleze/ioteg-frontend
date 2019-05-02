@@ -42,7 +42,6 @@ export default class App extends React.Component {
                         <Switch>
                             <Route exact path="/signin" component={WaitingComponent(SignIn)} />
                             <Route exact path="/signup" component={WaitingComponent(SignUp)} />
-                            <Route exact path="/" component={SearchChannel} />
                             <PrivateRoute path="/my-profile" component={WaitingComponent(ProfilePage)} />
                             <PrivateRoute path="/my-channels" component={WaitingComponent(MyChannelsPage)} />
                             <PrivateRoute exact path="/user/:userId/channels/edit/:channelId" component={WaitingComponent(ChannelEditor)} />
@@ -73,6 +72,7 @@ export default class App extends React.Component {
                             <PrivateRoute exact path="/customBehaviour/:customBehaviourId/rules/new" component={WaitingComponent(RuleEditor)} />
                             
                             <Route exact path="/forbidden" component={WaitingComponent(ForbiddenPage)} />
+                            <Route path="/" component={SearchChannel} />
                         </Switch>
                     </div>
                     <Notifier/>

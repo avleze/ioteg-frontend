@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { TextField, Button, Grid, FormHelperText, MenuItem } from '@material-ui/core';
+import { TextField, Button, Grid, FormHelperText, MenuItem, FormControlLabel, Switch } from '@material-ui/core';
 import { withRouter } from 'react-router-dom';
 import Axios from 'axios';
 import notify from '../../lib/notifier';
@@ -47,7 +47,17 @@ const formFields = [
         xs: 12,
         md: 12,
         lg: 4
-    }
+    },
+    {
+        id: "eventPublicity",
+        name: "isPublic",
+        type: "switch",
+        label: "Is public",
+        errorField: "eventType.isPublic",
+        xs: 12,
+        md: 12,
+        lg: 12
+    },
 ]
 
 const successCreateNotification = { content: 'Configurable event type created successfully', variant: "success" };
@@ -62,6 +72,7 @@ class ConfigurableEventTypeForm extends React.Component {
         super(props);
         this.state = {
             name: "",
+            isPublic: false,
             delay: 0,
             period: "",
             unit: "SECONDS",
@@ -70,13 +81,19 @@ class ConfigurableEventTypeForm extends React.Component {
 
         this.onSubmit = this.onSubmit.bind(this);
         this.onFieldChange = this.onFieldChange.bind(this);
+        this.handleSwitchChange = this.handleSwitchChange.bind(this);
     }
+
+    handleSwitchChange = name => event => {
+        this.setState({ [name]: event.target.checked });
+    };
 
     componentDidMount() {
         if (this.props.id)
             Axios.get(`/api/channels/1/configurableEventTypes/${this.props.id}`).then(async configurableEventType => {
                 this.setState({
                     name: configurableEventType.data.eventType.name,
+                    isPublic: configurableEventType.data.eventType.isPublic,
                     ...configurableEventType.data
                 });
             })
@@ -88,7 +105,8 @@ class ConfigurableEventTypeForm extends React.Component {
         confirmate(() => {
             let configurableEventType = {
                 eventType: {
-                    name: this.state.name
+                    name: this.state.name,
+                    isPublic: this.state.isPublic
                 },
                 delay: this.state.delay,
                 period: this.state.period,
@@ -146,26 +164,38 @@ class ConfigurableEventTypeForm extends React.Component {
 
                     {
                         formFields.map((formField, key) => {
-                            return <Grid item xs={formField.xs} md={formField.md} lg={formField.lg} key={key}>
-                                <TextField id={formField.id}
-                                    select={formField.type === "select"}
-                                    label={formField.label}
-                                    variant="outlined"
-                                    name={formField.name}
-                                    type={formField.type}
-                                    value={this.state[formField.name]}
-                                    onChange={this.onFieldChange}
-                                    fullWidth
-                                    error={this.state.errors[formField.errorField]}>
-                                    {
-                                        (formField.items || []).map((item) =>
-                                            <MenuItem value={item} key={item}>
-                                                {item}
-                                            </MenuItem>)
+                            if (formField.type === 'switch') {
+                                return <Grid item xs={formField.xs} md={formField.md} lg={formField.lg} key={key}><FormControlLabel
+                                    control={
+                                        <Switch
+                                            checked={this.state[formField.name] ? this.state[formField.name] : false}
+                                            onChange={this.handleSwitchChange(formField.name)}
+                                        />
                                     }
-                                </TextField>
-                                <FormHelperText error hidden={!this.state.errors[formField.errorField]}>{this.state.errors[formField.errorField]}</FormHelperText>
-                            </Grid>
+                                    label={formField.label}
+                                /></Grid>
+                            }
+                            else
+                                return <Grid item xs={formField.xs} md={formField.md} lg={formField.lg} key={key}>
+                                    <TextField id={formField.id}
+                                        select={formField.type === "select"}
+                                        label={formField.label}
+                                        variant="outlined"
+                                        name={formField.name}
+                                        type={formField.type}
+                                        value={this.state[formField.name]}
+                                        onChange={this.onFieldChange}
+                                        fullWidth
+                                        error={this.state.errors[formField.errorField]}>
+                                        {
+                                            (formField.items || []).map((item) =>
+                                                <MenuItem value={item} key={item}>
+                                                    {item}
+                                                </MenuItem>)
+                                        }
+                                    </TextField>
+                                    <FormHelperText error hidden={!this.state.errors[formField.errorField]}>{this.state.errors[formField.errorField]}</FormHelperText>
+                                </Grid>
                         })
                     }
 

@@ -69,10 +69,13 @@ export function changePassword(id, passwordDTO) {
 export function getUser(id) {
 
     let endpointUrl = `${apiUrl}/${id}`;
+    const header = localStorage.getItem('token');
 
     return function (dispatch) {
 
-        return Axios.get(endpointUrl).then(response => {
+        return Axios.get(endpointUrl, {
+            headers: {authorization: header }
+        }).then(response => {
             dispatch({
                 type: SET_AUTH_ACTION,
                 payload: { ...response.data, isLoggedIn: true },

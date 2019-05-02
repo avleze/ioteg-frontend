@@ -119,7 +119,7 @@ class ChannelEditor extends React.Component {
 
             <AsyncGenerationDialog open={this.state.asyncGenerationOpened}
                 channelId={channelId}
-                eventId = {this.state.selectedEventId}
+                eventId={this.state.selectedEventId}
                 topic={this.state.topic}
                 key={this.state.topic}
                 onClose={() => {

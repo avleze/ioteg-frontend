@@ -10,11 +10,13 @@ import setupAxiosInterceptors from './config/axios-interceptors';
 import { getUser } from './redux/reducers/auth';
 import jwt_decode from 'jwt-decode';
 
+if (localStorage.getItem('token'))
+    store.dispatch(getUser(jwt_decode(localStorage.getItem('token').slice(8)).id));
+
 setupAxiosInterceptors(() => store.dispatch({ type: SET_AUTH_ACTION, payload: {} }),
 () => window.location = '/forbidden');
 
-if (localStorage.getItem('token'))
-    store.dispatch(getUser(jwt_decode(localStorage.getItem('token').slice(8)).id));
+
 
 const theme = createMuiTheme({
     typography: {
