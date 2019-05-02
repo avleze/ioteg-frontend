@@ -154,7 +154,7 @@ class FieldForm extends React.Component {
                 formField.items = items;
 
             if (formField.type === 'switch') {
-                return <FormControlLabel
+                return <FormControlLabel key={key}
                     control={
                         <Switch
                             checked={this.state[formField.name] ? this.state[formField.name] : false}

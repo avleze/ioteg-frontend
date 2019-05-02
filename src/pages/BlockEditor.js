@@ -8,12 +8,20 @@ import { OptionalFieldsList } from "../components/optionalfields/OptionalFieldsL
 import confirm from "../lib/confirmation";
 import notify from "../lib/notifier";
 import Page from "./Page";
+import { InjectedFieldList } from "../components/injectedField/InjectedFieldList";
+import InjectedFieldDialogForm from "../components/injectedField/InjectedFieldDialogForm";
 
 const fieldDeleteSuccess = { content: 'Field deleted successfully.', variant: "success" }
 const fieldDeleteError = { content: 'Failed when deleting the field.', variant: "error" }
 
 const optionalFieldDeleteSuccess = { content: 'OptionalFields deleted successfully.', variant: "success" }
 const optionalFieldDeleteError = { content: 'Failed when deleting the OptionalFields.', variant: "error" }
+
+const injectedFieldDeleteSuccess = { content: 'Injected Field deleted successfully.', variant: "success" }
+const injectedFieldDeleteError = { content: 'Failed when deleting the Injected Field.', variant: "error" }
+
+const injectedFieldCreatedSuccess = { content: 'Injected Field created successfully.', variant: "success" }
+const injectedFieldCreatedError = { content: 'Failed when creating the Injected Field.', variant: "error" }
 
 class BlockEditor extends React.Component {
 
@@ -23,7 +31,8 @@ class BlockEditor extends React.Component {
             block: { id: null },
             optionalFields: [],
             fields: [],
-            injectedFields: []
+            injectedFields: [],
+            injectedFieldOpened: false
         }
 
         this.onFieldDelete = this.onFieldDelete.bind(this);
@@ -33,6 +42,10 @@ class BlockEditor extends React.Component {
         this.onOptionalFieldsAdd = this.onOptionalFieldsAdd.bind(this);
         this.onOptionalFieldsDelete = this.onOptionalFieldsDelete.bind(this);
         this.onOptionalFieldsEdit = this.onOptionalFieldsEdit.bind(this);
+
+        this.onDeleteInjectedField = this.onDeleteInjectedField.bind(this);
+        this.onAddInjectedField = this.onAddInjectedField.bind(this);
+
 
         this.getDataFromEndpoint = this.getDataFromEndpoint.bind(this);
     }
@@ -47,13 +60,15 @@ class BlockEditor extends React.Component {
         if (blockId) {
             Promise.all([Axios.get(`/api/events/${eventId}/blocks/${blockId}`),
             Axios.get(`/api/blocks/${blockId}/fields`),
-            Axios.get(`/api/blocks/${blockId}/optionalFields`)
+            Axios.get(`/api/blocks/${blockId}/optionalFields`),
+            Axios.get(`/api/blocks/${blockId}/injectedFields`)
             ])
                 .then(responses => {
                     this.setState({
                         block: responses[0].data,
                         fields: responses[1].data,
-                        optionalFields: responses[2].data
+                        optionalFields: responses[2].data,
+                        injectedFields: responses[3].data
                     })
                 })
 
@@ -107,6 +122,30 @@ class BlockEditor extends React.Component {
         this.props.history.push(`/blocks/${blockId}/optionalFields/edit/${optionalFieldsId}`)
     }
 
+    onDeleteInjectedField(rowData) {
+        const blockId = this.props.match.params["blockId"];
+        const injectedFieldId = rowData.id;
+        confirm(() => {
+            Axios.delete(`/api/blocks/${blockId}/injectedFields/${injectedFieldId}`)
+                .then(response => {
+                    this.getDataFromEndpoint();
+                    notify(injectedFieldDeleteSuccess)
+                })
+                .catch(error => notify(injectedFieldDeleteError));
+        })
+    }
+
+    onAddInjectedField(name) {
+        const blockId = this.props.match.params["blockId"];
+        Axios.post(`/api/blocks/${blockId}/injectedFields`, {name})
+            .then(response => {
+                this.getDataFromEndpoint();
+                this.setState({injectedFieldOpened: false})
+                notify(injectedFieldCreatedSuccess)
+            })
+            .catch(error => notify(injectedFieldCreatedError));
+    }
+
     render() {
         const eventId = this.props.match.params["eventTypeId"];
         const blockId = this.state.block.id;
@@ -146,8 +185,17 @@ class BlockEditor extends React.Component {
                             onEdit={this.onOptionalFieldsEdit}
                             onDelete={this.onOptionalFieldsDelete} />
                     </Grid>
+                    <Grid item xs={12} hidden={!blockId}>
+                        <InjectedFieldList injectedFields={this.state.injectedFields}
+                            onAdd={() => this.setState({ injectedFieldOpened: true })}
+                            onDelete={this.onDeleteInjectedField} />
+                    </Grid>
                 </Grid>
             </Grid>
+            <InjectedFieldDialogForm open={this.state.injectedFieldOpened}
+                onClose={() => this.setState({ injectedFieldOpened: false })}
+                onAdd={this.onAddInjectedField}
+            />
         </Page>
         )
     }
