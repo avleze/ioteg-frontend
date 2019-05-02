@@ -6,14 +6,15 @@ import { DialogContent, DialogActions, Typography, Button, Paper, TextField, Tab
 import PlayArrow from '@material-ui/icons/PlayArrow';
 import Stop from '@material-ui/icons/Stop';
 import mqtt from 'mqtt';
-import { write } from 'fs';
 import Axios from 'axios';
+
+const MQTT_CONFIG = {username: process.env.REACT_APP_MQTT_USERNAME, password: process.env.REACT_APP_MQTT_PASSWORD };
 
 export default class AsyncGenerationDialog extends React.Component {
 
     constructor(props) {
         super(props);
-        var client = mqtt.connect("mqtt://192.168.1.48:9001", { username: "admin", password: "admin" })
+        var client = mqtt.connect(process.env.REACT_APP_MQTT_BROKER, MQTT_CONFIG)
 
         client.on('message', (topic, message) => this.writeData(topic, message))
 
