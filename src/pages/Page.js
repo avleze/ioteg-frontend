@@ -21,7 +21,7 @@ class Page extends React.Component {
         return (
             <React.Fragment>
                 {this.props.topBar === undefined ? this.appBar() : null}
-                <Paper elevation={5} style={{ paddingTop: 20, paddingBottom: 20 }}>
+                <Paper elevation={5} style={{ paddingTop: 20, paddingBottom: 20, minHeight: 300 }}>
                     {this.props.children}
                 </Paper>
             </React.Fragment>);

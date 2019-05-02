@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import PrivateRoute from '../components/routing/PrivateRoute';
 import Notifier from '../components/Notifier';
 import { ConfirmationDialog } from '../components/ConfirmationDialog';
+import ForbiddenPage from './ForbiddenPage';
 
 const FieldEditorPage = React.lazy(() => import('../pages/FieldEditorPage'));
 const ConfigurableEventTypeEditor = React.lazy(() => import('../pages/ConfigurableEventTypeEditor'))
@@ -70,6 +71,8 @@ export default class App extends React.Component {
                             <PrivateRoute exact path="/customBehaviour/:customBehaviourId/variables/new" component={WaitingComponent(VariableEditor)} />
                             <PrivateRoute exact path="/customBehaviour/:customBehaviourId/rules/edit/:ruleId" component={WaitingComponent(RuleEditor)} />
                             <PrivateRoute exact path="/customBehaviour/:customBehaviourId/rules/new" component={WaitingComponent(RuleEditor)} />
+                            
+                            <Route exact path="/forbidden" component={WaitingComponent(ForbiddenPage)} />
                         </Switch>
                     </div>
                     <Notifier/>
