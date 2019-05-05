@@ -86,7 +86,10 @@ class BlockForm extends React.Component {
                     });
             } else {
                 Axios.post(`/api/events/${eventId}/blocks`, block)
-                    .then(response => notify(successCreateNotification))
+                    .then(response => {
+                        this.props.history.goBack();
+                        notify(successCreateNotification)
+                    })
                     .catch(error => {
                         let errors = {};
 

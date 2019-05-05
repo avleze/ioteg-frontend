@@ -8,8 +8,8 @@ import notify from "../lib/notifier";
 import Page from "./Page";
 import OptionalFieldsForm from "../components/optionalfields/OptionalFieldsForm";
 
-const fieldDeleteSuccess = { content: 'Field deleted successfully.' }
-const fieldDeleteError = { content: 'Failed when deleting the field.' }
+const fieldDeleteSuccess = { content: 'Field deleted successfully.', variant: 'success'}
+const fieldDeleteError = { content: 'Failed when deleting the field.', variant: 'error'}
 
 const optionalFieldsCreatedSuccesfully = { content: 'OptionalFields created successfully', variant: 'success' };
 const optionalFieldsCreatedError = { content: 'Failed when creating the OptionalFields', variant: 'error' };
@@ -67,32 +67,34 @@ class OptionalFieldsEditor extends React.Component {
 
 
     onOptionalFieldsSubmit(optionalFields) {
-        const blockId = this.props.match.params["blockId"];
-        const optionalFieldsId = this.props.match.params["optionalFieldsId"];
-        if (optionalFieldsId)
-            Axios.put(`/api/blocks/${blockId}/optionalFields/${optionalFieldsId}`, optionalFields)
-                .then(response => {
-                    this.getDataFromEndpoint();
-                    notify(optionalFieldsEditedSuccesfully)
-                })
-                .catch(errors => {
-                    this.setState({
-                        errors: this.getErrors(errors)
+        confirm(() => {
+            const blockId = this.props.match.params["blockId"];
+            const optionalFieldsId = this.props.match.params["optionalFieldsId"];
+            if (optionalFieldsId)
+                Axios.put(`/api/blocks/${blockId}/optionalFields/${optionalFieldsId}`, optionalFields)
+                    .then(response => {
+                        this.getDataFromEndpoint();
+                        notify(optionalFieldsEditedSuccesfully)
                     })
-                    notify(optionalFieldsEditedError)
-                })
-        else
-            Axios.post(`/api/blocks/${blockId}/optionalFields`, optionalFields)
-                .then(response => {
-                    this.getDataFromEndpoint();
-                    notify(optionalFieldsCreatedSuccesfully)
-                })
-                .catch(errors => {
-                    this.setState({
-                        errors: this.getErrors(errors)
+                    .catch(errors => {
+                        this.setState({
+                            errors: this.getErrors(errors)
+                        })
+                        notify(optionalFieldsEditedError)
                     })
-                    notify(optionalFieldsCreatedError)
-                })
+            else
+                Axios.post(`/api/blocks/${blockId}/optionalFields`, optionalFields)
+                    .then(response => {
+                        this.props.history.goBack();
+                        notify(optionalFieldsCreatedSuccesfully)
+                    })
+                    .catch(errors => {
+                        this.setState({
+                            errors: this.getErrors(errors)
+                        })
+                        notify(optionalFieldsCreatedError)
+                    })
+        })
 
     }
 
@@ -111,7 +113,7 @@ class OptionalFieldsEditor extends React.Component {
         const optionalFieldsId = this.props.match.params["optionalFieldsId"];
         const fieldId = rowData.id;
         confirm(() => {
-            Axios.delete(`/api/optionalfields/${optionalFieldsId}/fields/${fieldId}`)
+            Axios.delete(`/api/optionalFields/${optionalFieldsId}/fields/${fieldId}`)
                 .then(response => {
                     this.getDataFromEndpoint();
                     notify(fieldDeleteSuccess)

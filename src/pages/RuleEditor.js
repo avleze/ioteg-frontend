@@ -78,7 +78,10 @@ class RuleEditor extends React.Component {
                     })
             else
                 Axios.post(`/api/customBehaviour/${customBehaviourId}/rules`, rule)
-                    .then(response => notify(ruleCreatedSuccesfully))
+                    .then(response => {
+                        this.props.history.goBack();
+                        notify(ruleCreatedSuccesfully)
+                    })
                     .catch(errors => {
                         this.setState({
                             errors: this.getErrors(errors)

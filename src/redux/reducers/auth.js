@@ -81,6 +81,14 @@ export function getUser(id) {
                 payload: { ...response.data, isLoggedIn: true },
             });
             return response;
+        })
+        .catch(error => {
+            dispatch({
+                type: SET_AUTH_ACTION,
+                payload: { isLoggedIn: false },
+            });
+            localStorage.removeItem('token');
+            sessionStorage.removeItem('token');
         });
 
     }

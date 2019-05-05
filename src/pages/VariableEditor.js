@@ -78,7 +78,10 @@ class VariableEditor extends React.Component {
                     })
             else
                 Axios.post(`/api/customBehaviour/${customBehaviourId}/variables`, variable)
-                    .then(response => notify(variableCreatedSuccesfully))
+                    .then(response => {
+                        this.props.history.goBack();
+                        notify(variableCreatedSuccesfully)
+                    })
                     .catch(errors => {
                         this.setState({
                             errors: this.getErrors(errors)

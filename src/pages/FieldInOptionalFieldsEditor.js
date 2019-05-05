@@ -29,7 +29,10 @@ class FieldInOptionalFieldsEditor extends React.Component {
 
         if (!fieldId)
             Axios.post(`/api/optionalFields/${optionalFieldsId}/fields`, field)
-                .then(response => notify(fieldCreatedSuccesfully))
+                .then(response => {
+                    this.props.history.goBack();
+                    notify(fieldCreatedSuccesfully)
+                })
                 .catch(error => {
                     this.setState({
                         errors: getErrors(error)
@@ -51,10 +54,10 @@ class FieldInOptionalFieldsEditor extends React.Component {
     render() {
         const fieldId = this.props.match.params["fieldId"];
         const optionalFieldsId = this.props.match.params["optionalFieldsId"];
-        
+
         const getFieldURL = `/api/optionalFields/${optionalFieldsId}/fields/${fieldId}`;
 
-        return (<FieldEditor getFieldURL={getFieldURL} onSubmit={this.onFieldSubmit} fieldId={fieldId} errors={this.state.errors} allowComplex/>)
+        return (<FieldEditor getFieldURL={getFieldURL} onSubmit={this.onFieldSubmit} fieldId={fieldId} errors={this.state.errors} allowComplex />)
     }
 
 }

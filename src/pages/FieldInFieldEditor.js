@@ -29,7 +29,10 @@ class FieldInFieldEditor extends React.Component {
 
         if (!fieldId2)
             Axios.post(`/api/fields/${fieldId1}/fields`, field)
-                .then(response => notify(fieldCreatedSuccesfully))
+                .then(response => {
+                    this.props.history.goBack();
+                    notify(fieldCreatedSuccesfully)
+                })
                 .catch(error => {
                     this.setState({
                         errors: getErrors(error)
@@ -45,6 +48,7 @@ class FieldInFieldEditor extends React.Component {
                     });
                     notify(fieldEditedError)
                 })
+
     }
 
     render() {
@@ -52,7 +56,7 @@ class FieldInFieldEditor extends React.Component {
         const fieldId2 = this.props.match.params["fieldId2"];
         const getFieldURL = `/api/blocks/${fieldId1}/fields/${fieldId2}`;
 
-        return (<FieldEditor getFieldURL={getFieldURL} onSubmit={this.onFieldSubmit} fieldId={fieldId2} errors={this.state.errors} allowComplex={false}/>)
+        return (<FieldEditor getFieldURL={getFieldURL} onSubmit={this.onFieldSubmit} fieldId={fieldId2} errors={this.state.errors} allowComplex={false} />)
     }
 
 }
