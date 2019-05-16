@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Paper, Grid, Typography, Divider } from "@material-ui/core";
+import { Paper, Grid, Typography, Divider, CircularProgress } from "@material-ui/core";
 import { withRouter } from 'react-router'
 import Page from "./Page";
 import FieldForm from "../components/fields/FieldForm";
@@ -36,7 +36,8 @@ class FieldEditor extends React.Component {
             attributes: [],
             rules: [],
             variables: [],
-            errors: {}
+            errors: {},
+            fetching: true
         }
 
         this.getDataFromEndpoint = this.getDataFromEndpoint.bind(this);
@@ -69,6 +70,9 @@ class FieldEditor extends React.Component {
         const fieldId = this.props.fieldId
 
         if (fieldId) {
+            this.setState({
+                fetching: true
+            })
             Promise.all([Axios.get(this.props.getFieldURL),
             Axios.get(`/api/fields/${fieldId}/fields`),
             Axios.get(`/api/fields/${fieldId}/attributes`)])
@@ -87,11 +91,20 @@ class FieldEditor extends React.Component {
                             .then(responses => {
                                 this.setState({
                                     variables: responses[0].data,
-                                    rules: responses[1].data
+                                    rules: responses[1].data,
+                                    fetching: false,
                                 });
                             })
+                    else
+                        this.setState({
+                            fetching: false,
+                        })
                 });
         }
+        else
+            this.setState({
+                fetching: false
+            })
 
 
     }
@@ -208,6 +221,13 @@ class FieldEditor extends React.Component {
     render() {
         const fieldId = this.props.fieldId;
         const customBehaviourId = _.get(this.state, 'field.customBehaviour.id');
+
+        if (this.state.fetching)
+            return <Page>
+                <Grid container justify="center" spacing={24}>
+                    <CircularProgress size={80} style={{marginTop: 50}}></CircularProgress>
+                </Grid>
+            </Page>
 
         return (<Page>
 

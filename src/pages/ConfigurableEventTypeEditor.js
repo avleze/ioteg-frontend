@@ -1,6 +1,6 @@
 import * as React from "react";
 import Axios from "axios";
-import { Paper, Grid, Typography, Divider } from "@material-ui/core";
+import { Paper, Grid, Typography, Divider, CircularProgress } from "@material-ui/core";
 import { withRouter } from 'react-router'
 import ConfigurableEventTypeForm from "../components/configurableEventTypes/ConfigurableEventTypeForm";
 import { BlockList } from "../components/blocks/BlockList";
@@ -16,7 +16,8 @@ class ConfigurableEventTypeEditor extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            blocks: []
+            blocks: [],
+            fetching: true,
         }
         this.getDataFromEndpoint = this.getDataFromEndpoint.bind(this);
 
@@ -32,15 +33,21 @@ class ConfigurableEventTypeEditor extends React.Component {
     async getDataFromEndpoint() {
         const channelId = this.props.match.params["channelId"];
         const configurableEventTypeId = this.props.match.params["configurableEventTypeId"];
-        if (configurableEventTypeId !== undefined)
+        if (configurableEventTypeId !== undefined) {
+            this.setState({ fetching: true })
             await Axios.get(`/api/channels/${channelId}/configurableEventTypes/${configurableEventTypeId}`).then(async configurableEventType => {
 
                 await Axios.get(`/api/events/${configurableEventType.data.eventType.id}/blocks`).then(blocks => {
                     this.setState({
                         eventId: configurableEventType.data.eventType.id,
-                        blocks: blocks.data
+                        blocks: blocks.data,
+                        fetching: false
                     });
                 })
+            })
+        } else
+            this.setState({
+                fetching: false
             })
     }
 
@@ -73,6 +80,13 @@ class ConfigurableEventTypeEditor extends React.Component {
     render() {
         const configurableEventTypeId = this.props.match.params["configurableEventTypeId"];
         const channelId = this.props.match.params["channelId"];
+
+        if (this.state.fetching)
+        return <Page>
+            <Grid container justify="center" spacing={24}>
+                <CircularProgress size={80} style={{marginTop: 50}}></CircularProgress>
+            </Grid>
+        </Page>
 
         return (
             <Page>

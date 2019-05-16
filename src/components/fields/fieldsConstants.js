@@ -34,7 +34,7 @@ const normalSequentialFields = [
     {
         id: "step",
         name: "step",
-        type: "text",
+        type: "number",
         label: "Step",
         errorField: "step",
         xs: 12,
@@ -60,7 +60,7 @@ const normalRandomFields = [
     {
         id: "min",
         name: "min",
-        type: "text",
+        type: "number",
         label: "Minimum",
         errorField: "min",
         xs: 12,
@@ -70,7 +70,7 @@ const normalRandomFields = [
     {
         id: "max",
         name: "max",
-        type: "text",
+        type: "number",
         label: "Maximum",
         errorField: "max",
         xs: 12,

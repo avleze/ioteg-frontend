@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Grid, Typography } from '@material-ui/core';
+import { Grid, Typography, CircularProgress } from '@material-ui/core';
 import { connect } from 'react-redux';
 import Axios from 'axios';
 import { withRouter } from 'react-router-dom';
@@ -17,7 +17,8 @@ export class MyChannelsPage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            channels: []
+            channels: [],
+            fetching: true,
         }
 
         this.getDataFromEndpoint = this.getDataFromEndpoint.bind(this);
@@ -34,12 +35,21 @@ export class MyChannelsPage extends React.Component {
 
     async getDataFromEndpoint() {
         const userId = jwt_decode(localStorage.getItem('token')).id;
-        if (userId)
+        if (userId) {
+            this.setState({
+                fetching: true
+            })
             await Axios.get(`/api/users/${userId}/channels`).then(response => {
                 this.setState({
-                    channels: response.data
+                    channels: response.data,
+                    fetching: false
                 })
             })
+        } else
+            this.setState({
+                fetching: false
+            })
+            
     }
 
     onChannelAdd() {
@@ -63,6 +73,14 @@ export class MyChannelsPage extends React.Component {
 
 
     render() {
+
+        if (this.state.fetching)
+        return <Page topBar={false}>
+            <Grid container justify="center" spacing={24}>
+                <CircularProgress size={80} style={{marginTop: 50}}></CircularProgress>
+            </Grid>
+        </Page>
+
         return (
             <Page topBar={false}>
                 <Grid container justify="center" spacing={24}>

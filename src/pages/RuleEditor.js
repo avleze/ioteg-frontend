@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Paper, Grid, Typography, Divider } from "@material-ui/core";
+import { Paper, Grid, Typography, Divider, CircularProgress } from "@material-ui/core";
 import { withRouter } from 'react-router'
 import Page from "./Page";
 import Axios from "axios";
@@ -19,7 +19,8 @@ class RuleEditor extends React.Component {
         super(props);
         this.state = {
             rule: { id: null },
-            errors: {}
+            errors: {},
+            fetching: true
         }
 
         this.getDataFromEndpoint = this.getDataFromEndpoint.bind(this);
@@ -36,13 +37,17 @@ class RuleEditor extends React.Component {
         const ruleId = this.props.match.params["ruleId"];
 
         if (ruleId) {
+            this.setState({ fetching: true })
             Axios.get(`/api/customBehaviour/${customBehaviourId}/rules/${ruleId}`)
                 .then(response => {
                     this.setState({
-                        rule: response.data
+                        rule: response.data,
+                        fetching: false
                     });
                 });
-        }
+        } else
+            this.setState({ fetching: false })
+
 
 
     }
@@ -93,6 +98,13 @@ class RuleEditor extends React.Component {
 
     render() {
         const ruleId = this.props.match.params["ruleId"];
+
+        if (this.state.fetching)
+        return <Page>
+            <Grid container justify="center" spacing={24}>
+                <CircularProgress size={80} style={{marginTop: 50}}></CircularProgress>
+            </Grid>
+        </Page>
 
         return (<Page>
 

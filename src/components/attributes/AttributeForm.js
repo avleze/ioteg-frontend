@@ -165,6 +165,7 @@ class AttributeForm extends React.Component {
     }
 
     render() {
+        console.log(this.props)
         return (
             <form onSubmit={this.onSubmit}>
                 <Grid container spacing={8}>

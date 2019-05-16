@@ -1,6 +1,6 @@
 import * as React from "react";
 import Axios from "axios";
-import { Paper, Grid, Typography, Divider } from "@material-ui/core";
+import { Paper, Grid, Typography, Divider, CircularProgress } from "@material-ui/core";
 import ChannelForm from "../components/channels/ChannelForm";
 import notify from "../lib/notifier";
 import { withRouter } from 'react-router';
@@ -22,7 +22,8 @@ class ChannelEditor extends React.Component {
             channelName: "",
             configurableEventTypes: [],
             chooseFormatOpened: false,
-            asyncGenerationOpened: false
+            asyncGenerationOpened: false,
+            fetching: true
         }
 
         this.onConfigurableEventTypeAdd = this.onConfigurableEventTypeAdd.bind(this);
@@ -33,16 +34,24 @@ class ChannelEditor extends React.Component {
     async componentDidMount() {
         const channelId = this.props.match.params["channelId"];
         const userId = this.props.match.params["userId"];
-        if (channelId !== undefined)
+        if (channelId !== undefined) {
+            this.setState({
+                fetching: true
+            })
             await Axios.get(`/api/users/${userId}/channels/${channelId}`).then(async channel => {
 
                 await Axios.get(`/api/channels/${channelId}/configurableEventTypes`).then(configurableEventTypes => {
                     this.setState({
                         id: channelId,
                         channelName: channel.data["channelName"],
-                        configurableEventTypes: configurableEventTypes.data
+                        configurableEventTypes: configurableEventTypes.data,
+                        fetching: false
                     });
                 })
+            })
+        } else
+            this.setState({
+                fetching: false
             })
     }
 
@@ -73,6 +82,13 @@ class ChannelEditor extends React.Component {
 
     render() {
         const channelId = this.props.match.params["channelId"];
+
+        if (this.state.fetching)
+        return <Page>
+            <Grid container justify="center" spacing={24}>
+                <CircularProgress size={80} style={{marginTop: 50}}></CircularProgress>
+            </Grid>
+        </Page>
 
         return (<Page>
 

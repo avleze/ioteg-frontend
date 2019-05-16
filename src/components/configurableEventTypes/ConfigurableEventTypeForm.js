@@ -43,7 +43,7 @@ const formFields = [
         type: "select",
         label: "Unit",
         errorField: "unit",
-        items: ["NANOSECONDS", "MICROSECONDS", "MILLISECONDS", "SECONDS", "MINUTES", "HOURS", "DAYS"],
+        items: ["MILLISECONDS", "SECONDS", "MINUTES", "HOURS", "DAYS"],
         xs: 12,
         md: 12,
         lg: 4

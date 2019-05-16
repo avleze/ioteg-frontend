@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Paper, Grid, Typography, Divider } from "@material-ui/core";
+import { Paper, Grid, Typography, Divider, CircularProgress } from "@material-ui/core";
 import { withRouter } from 'react-router'
 import Page from "./Page";
 import Axios from "axios";
@@ -19,7 +19,8 @@ class VariableEditor extends React.Component {
         super(props);
         this.state = {
             variable: { id: null },
-            errors: {}
+            errors: {},
+            fetching: true,
         }
 
         this.getDataFromEndpoint = this.getDataFromEndpoint.bind(this);
@@ -36,13 +37,18 @@ class VariableEditor extends React.Component {
         const variableId = this.props.match.params["variableId"];
 
         if (variableId) {
+            this.setState({ fetching: true})
             Axios.get(`/api/customBehaviour/${customBehaviourId}/variables/${variableId}`)
                 .then(response => {
                     this.setState({
-                        variable: response.data
+                        variable: response.data,
+                        fetching: false
                     });
                 });
-        }
+        } else 
+            this.setState({
+                fetching: false
+            })
 
 
     }
@@ -93,6 +99,13 @@ class VariableEditor extends React.Component {
 
     render() {
         const variableId = this.props.match.params["variableId"];
+
+        if (this.state.fetching)
+        return <Page>
+            <Grid container justify="center" spacing={24}>
+                <CircularProgress size={80} style={{marginTop: 50}}></CircularProgress>
+            </Grid>
+        </Page>
 
         return (<Page>
 

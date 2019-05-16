@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Paper, Grid, Typography, Divider } from "@material-ui/core";
+import { Paper, Grid, Typography, Divider, CircularProgress } from "@material-ui/core";
 import { withRouter } from 'react-router'
 import Page from "./Page";
 import Axios from "axios";
@@ -20,7 +20,8 @@ class AttributeEditor extends React.Component {
         this.state = {
             attribute: { id: null },
             type: undefined,
-            errors: {}
+            errors: {},
+            fetching: true,
         }
 
         this.getDataFromEndpoint = this.getDataFromEndpoint.bind(this);
@@ -37,13 +38,20 @@ class AttributeEditor extends React.Component {
         const attributeId = this.props.match.params["attributeId"];
 
         if (attributeId) {
+            this.setState({
+                fetching: true
+            })
             Axios.get(`/api/fields/${fieldId}/attributes/${attributeId}`)
                 .then(response => {
                     this.setState({
-                        attribute: response.data
+                        attribute: response.data,
+                        fetching: false
                     });
                 });
-        }
+        } else  
+        this.setState({
+            fetching: false
+        })
 
 
     }
@@ -71,7 +79,10 @@ class AttributeEditor extends React.Component {
 
             if (!attributeId)
                 Axios.post(`/api/fields/${fieldId}/attributes`, attribute)
-                    .then(response => notify(attributeCreatedSuccesfully))
+                    .then(response => {
+                        this.props.history.goBack();
+                        notify(attributeCreatedSuccesfully)
+                    })
                     .catch(error => {
                         this.setState({
                             errors: this.getErrors(error)
@@ -80,7 +91,12 @@ class AttributeEditor extends React.Component {
                     })
             else
                 Axios.put(`/api/fields/${fieldId}/attributes/${attributeId}`, attribute)
-                    .then(response => notify(attributeEditedSuccesfully))
+                    .then(response => {
+                        this.setState({
+                            errors: {}
+                        });
+                        notify(attributeEditedSuccesfully)
+                    })
                     .catch(error => {
                         this.setState({
                             errors: this.getErrors(error)
@@ -92,6 +108,13 @@ class AttributeEditor extends React.Component {
 
     render() {
         const attributeId = this.props.match.params["attributeId"];
+
+        if (this.state.fetching)
+        return <Page>
+            <Grid container justify="center" spacing={24}>
+                <CircularProgress size={80} style={{marginTop: 50}}></CircularProgress>
+            </Grid>
+        </Page>
 
         return (<Page>
 

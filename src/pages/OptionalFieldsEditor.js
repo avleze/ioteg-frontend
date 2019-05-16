@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Paper, Grid, Typography, Divider } from "@material-ui/core";
+import { Paper, Grid, Typography, Divider, CircularProgress } from "@material-ui/core";
 import { withRouter } from 'react-router'
 import Axios from "axios";
 import { FieldList } from "../components/fields/FieldList";
@@ -24,6 +24,7 @@ class OptionalFieldsEditor extends React.Component {
         this.state = {
             optionalFields: { id: null },
             fields: [],
+            fetching: true,
         }
 
         this.onFieldDelete = this.onFieldDelete.bind(this);
@@ -43,16 +44,20 @@ class OptionalFieldsEditor extends React.Component {
         const blockId = this.props.match.params["blockId"];
         const optionalFieldsId = this.props.match.params["optionalFieldsId"];
         if (optionalFieldsId) {
+            this.setState({fetching: true})
             Promise.all([Axios.get(`/api/blocks/${blockId}/optionalFields/${optionalFieldsId}`),
             Axios.get(`/api/optionalFields/${optionalFieldsId}/fields`)])
                 .then(responses => {
                     this.setState({
                         fields: responses[1].data,
-                        optionalFields: responses[0].data
+                        optionalFields: responses[0].data,
+                        fetching: false
                     })
                 })
-
-        }
+        } else
+         this.setState({
+             fetching: false
+         })
     }
 
     getErrors(error) {
@@ -124,6 +129,13 @@ class OptionalFieldsEditor extends React.Component {
 
     render() {
         const optionalFieldsId = this.props.match.params["optionalFieldsId"];
+
+        if (this.state.fetching)
+        return <Page>
+            <Grid container justify="center" spacing={24}>
+                <CircularProgress size={80} style={{marginTop: 50}}></CircularProgress>
+            </Grid>
+        </Page>
 
         return (<Page>
             <Grid container justify="center" spacing={24}>

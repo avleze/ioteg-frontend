@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Paper, Grid, Typography, Divider } from "@material-ui/core";
+import { Paper, Grid, Typography, Divider, CircularProgress } from "@material-ui/core";
 import { withRouter } from 'react-router'
 import Axios from "axios";
 import BlockForm from "../components/blocks/BlockForm";
@@ -32,7 +32,8 @@ class BlockEditor extends React.Component {
             optionalFields: [],
             fields: [],
             injectedFields: [],
-            injectedFieldOpened: false
+            injectedFieldOpened: false,
+            fetching: true
         }
 
         this.onFieldDelete = this.onFieldDelete.bind(this);
@@ -58,6 +59,7 @@ class BlockEditor extends React.Component {
         const eventId = this.props.match.params["eventTypeId"];
         const blockId = this.props.match.params["blockId"];
         if (blockId) {
+            this.setState({fetching: true})
             Promise.all([Axios.get(`/api/events/${eventId}/blocks/${blockId}`),
             Axios.get(`/api/blocks/${blockId}/fields`),
             Axios.get(`/api/blocks/${blockId}/optionalFields`),
@@ -68,11 +70,12 @@ class BlockEditor extends React.Component {
                         block: responses[0].data,
                         fields: responses[1].data,
                         optionalFields: responses[2].data,
-                        injectedFields: responses[3].data
+                        injectedFields: responses[3].data,
+                        fetching: false
                     })
                 })
-
-        }
+        } else 
+            this.setState({fetching : false})
     }
 
     onFieldAdd() {
@@ -149,6 +152,13 @@ class BlockEditor extends React.Component {
     render() {
         const eventId = this.props.match.params["eventTypeId"];
         const blockId = this.state.block.id;
+
+        if (this.state.fetching)
+        return <Page>
+            <Grid container justify="center" spacing={24}>
+                <CircularProgress size={80} style={{marginTop: 50}}></CircularProgress>
+            </Grid>
+        </Page>
 
         return (<Page>
             <Grid container justify="center" spacing={24}>
