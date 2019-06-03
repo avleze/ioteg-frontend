@@ -165,7 +165,9 @@ class ChannelEditor extends React.Component {
                             link.setAttribute('download', this.state.selected.eventType.name + `.${item}`.toLowerCase());
                             document.body.appendChild(link);
                             link.click();
-                        });
+                            notify({content: "Event generated successfully.", variant: "success"})
+                        })
+                        .catch(error => notify({content: "There was an error generating the event, please check the event type definition.", variant: "error"}));
 
                 this.setState({
                     chooseFormatOpened: false
